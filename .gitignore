@@ -1,0 +1,70 @@
+# Ignore Visual Studio temporary files, build results, and user-specific files
+
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# VS Code settings
+.vscode/
+
+# Rider project files
+.idea/
+
+# Visual Studio folder
+.vs/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# DotCover
+*.dotCover
+
+# SQL Server files
+*.mdf
+*.ldf
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# NCrunch
+*.ncrunch*
+.*crunch*.local.xml
+
+# DotNet specific
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Logs
+*.log
+
+# Others
+*.tlog
+*.cache
+*.dbmdl
+*.pdb
+*.vsp
+*.vspx
+*.dll
+*.exe
+
+# Publish artifacts
+publish/
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+.nuget/
+packages/
