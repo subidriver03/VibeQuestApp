@@ -1,0 +1,68 @@
+﻿@inherits ProtectedPageBase
+@page "/quests"
+@using Microsoft.EntityFrameworkCore
+@using VibeQuestApp.Models
+@using VibeQuestApp.Data
+@using VibeQuestApp.Services
+@inject AppDbContext Db
+@inject QuestService QuestService
+
+<h3>Quest Board</h3>
+<p>Complete daily quests to earn XP and level up!</p>
+
+@if (quests == null)
+{
+    <p>Loading quests...</p>
+}
+else if (!quests.Any())
+{
+    <p>No quests available. Check back soon!</p>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var quest in quests)
+        {
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>@quest.Title</strong>
+                        <p class="mb-1">@quest.Description</p>
+                        <small>XP: @quest.XpReward | Due: @(quest.DueDate?.ToShortDateString() ?? "No due date")</small>
+                    </div>
+                    <button class="btn btn-success" @onclick="() => CompleteQuest(quest.Id)">Complete</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Quest>? quests;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadQuests();
+    }
+
+    private async Task LoadQuests()
+    {
+        var userId = Session.CurrentUser?.Id ?? 0;
+        quests = await Db.Quests
+            .Where(q => q.UserId == userId && !q.IsCompleted)
+            .OrderBy(q => q.DueDate)
+            .ToListAsync();
+    }
+
+    private async Task CompleteQuest(int questId)
+    {
+        var userId = Session.CurrentUser?.Id ?? 0;
+        bool success = await QuestService.CompleteQuestAsync(questId, userId);
+
+        if (success)
+        {
+            await LoadQuests();
+            StateHasChanged();
+        }
+    }
+}

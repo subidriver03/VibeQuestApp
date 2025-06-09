@@ -1,0 +1,68 @@
+﻿@inherits ProtectedPageBase
+@page "/reward-store"
+@using VibeQuestApp.Models
+
+<PageTitle>Reward Store</PageTitle>
+
+<h2 class="mt-3">🎁 Reward Store</h2>
+<p>Spend your XP on rewards that motivate you to keep going!</p>
+
+@if (AvailableRewards.Count == 0)
+{
+    <p>No rewards available yet. Check back soon!</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var reward in AvailableRewards)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@reward.Title</h5>
+                        <p class="card-text">@reward.Description</p>
+                        <p><strong>Cost:</strong> @reward.XpCost XP</p>
+                        <button class="btn btn-primary" @onclick="() => RedeemReward(reward)">Redeem</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success mt-3">@successMessage</div>
+}
+
+@code {
+    private List<RewardItem> AvailableRewards = new()
+    {
+        new RewardItem { Title = "Netflix Night", Description = "Watch a guilt-free episode of your favorite show.", XpCost = 200 },
+        new RewardItem { Title = "Coffee Treat", Description = "Enjoy a fancy coffee or tea from your favorite spot.", XpCost = 150 },
+        new RewardItem { Title = "Game Break", Description = "Take 30 minutes to play your favorite video game.", XpCost = 300 }
+    };
+
+    private int CurrentXp = 500; // TEMP: Replace with actual XP from user profile later
+    private string? successMessage;
+
+    private void RedeemReward(RewardItem reward)
+    {
+        if (CurrentXp >= reward.XpCost)
+        {
+            CurrentXp -= reward.XpCost;
+            successMessage = $"You redeemed: {reward.Title}!";
+        }
+        else
+        {
+            successMessage = $"Not enough XP to redeem: {reward.Title}.";
+        }
+    }
+
+    private class RewardItem
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public int XpCost { get; set; }
+    }
+}

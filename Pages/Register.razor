@@ -1,0 +1,88 @@
+﻿@page "/register"
+@using System.ComponentModel.DataAnnotations
+@using VibeQuestApp.Data
+@using VibeQuestApp.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Db
+@inject NavigationManager NavigationManager
+
+<h3>Create Your Account</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p style="color:red">@ErrorMessage</p>
+}
+
+<EditForm Model="registrationModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Email:</label><br />
+        <InputText @bind-Value="registrationModel.Email" />
+    </div>
+
+    <div>
+        <label>Password:</label><br />
+        <InputText @bind-Value="registrationModel.Password" type="password" />
+    </div>
+
+    <div>
+        <label>Confirm Password:</label><br />
+        <InputText @bind-Value="registrationModel.ConfirmPassword" type="password" />
+    </div>
+
+    <br />
+    <button type="submit">Register</button>
+</EditForm>
+
+@code {
+    private RegistrationModel registrationModel = new();
+    private string? ErrorMessage;
+
+    public class RegistrationModel
+    {
+        [Required, EmailAddress]
+        public string? Email { get; set; }
+
+        [Required, MinLength(6)]
+        public string? Password { get; set; }
+
+        [Required, Compare(nameof(Password), ErrorMessage = "Passwords do not match")]
+        public string? ConfirmPassword { get; set; }
+    }
+
+    private async Task HandleRegister()
+    {
+        var exists = await Db.Users.AnyAsync(u => u.Email == registrationModel.Email);
+        if (exists)
+        {
+            ErrorMessage = "That email is already registered.";
+            return;
+        }
+
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registrationModel.Password!);
+
+        var user = new User
+        {
+            Email = registrationModel.Email!,
+            PasswordHash = hashedPassword
+        };
+
+        Db.Users.Add(user);
+        await Db.SaveChangesAsync();
+
+        // Create empty HeroProfile tied to new user
+        var profile = new HeroProfile
+        {
+            UserId = user.Id,
+            HeroName = "",
+            AvatarUrl = ""
+        };
+
+        Db.HeroProfiles.Add(profile);
+        await Db.SaveChangesAsync();
+
+        NavigationManager.NavigateTo("/login");
+    }
+}

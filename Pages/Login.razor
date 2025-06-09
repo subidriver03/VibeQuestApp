@@ -1,0 +1,79 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.EntityFrameworkCore
+@using VibeQuestApp.Data
+@using VibeQuestApp.Models
+@inject AppDbContext Db
+@inject NavigationManager NavigationManager
+@inject VibeQuestApp.Services.UserSessionService Session
+@inject ILogger<Login> Logger
+
+<h3>Login</h3>
+
+@if (loginFailed)
+{
+    <div class="alert alert-danger">Invalid email or password. Please try again.</div>
+}
+
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Email:</label>
+        <InputText class="form-control" @bind-Value="loginModel.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label>Password:</label>
+        <InputText type="password" class="form-control" @bind-Value="loginModel.Password" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Login</button>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new();
+    private bool loginFailed = false;
+
+    private async Task HandleLogin()
+    {
+        Logger.LogDebug("Attempting login for email: {Email}", loginModel.Email);
+
+        var user = await Db.Users
+            .FirstOrDefaultAsync(u => u.Email == loginModel.Email);
+
+        if (user != null)
+        {
+            Logger.LogDebug("User found. Verifying password...");
+
+            bool passwordMatches = BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash);
+            if (passwordMatches)
+            {
+                Logger.LogInformation("Login successful for user: {Email}", user.Email);
+                Session.SetUser(user);
+                NavigationManager.NavigateTo("/profile");
+                return;
+            }
+            else
+            {
+                Logger.LogWarning("Password mismatch for email: {Email}", loginModel.Email);
+            }
+        }
+        else
+        {
+            Logger.LogWarning("No user found with email: {Email}", loginModel.Email);
+        }
+
+        loginFailed = true;
+    }
+
+    private class LoginModel
+    {
+        [Required]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
+    }
+}

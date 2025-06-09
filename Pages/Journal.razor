@@ -1,0 +1,58 @@
+﻿@inherits ProtectedPageBase
+@page "/journal"
+@using VibeQuestApp.Data
+@using VibeQuestApp.Models
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.EntityFrameworkCore.Sqlite
+@inject AppDbContext Db
+
+<PageTitle>Journal</PageTitle>
+
+<h3>Daily Journal</h3>
+
+<div class="mb-3">
+    <textarea class="form-control" @bind="newEntry.Content" placeholder="Write your thoughts here..." rows="5"></textarea>
+    <button class="btn btn-primary mt-2" @onclick="SaveEntry">Save Entry</button>
+</div>
+
+@if (entries?.Any() == true)
+{
+    <h4>Your Past Entries</h4>
+    <ul class="list-group">
+        @foreach (var entry in entries.OrderByDescending(e => e.DateCreated))
+        {
+            <li class="list-group-item">
+                <strong>@entry.DateCreated.ToShortDateString()</strong>
+                <p>@entry.Content</p>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No journal entries yet. Start writing to reflect on your journey.</p>
+}
+
+@code {
+    private List<JournalEntry> entries = new();
+    private JournalEntry newEntry = new();
+    private int currentUserId = 1; // Replace with actual user ID after login system is complete
+
+    protected override async Task OnInitializedAsync()
+    {
+        entries = await Db.JournalEntries
+                          .Where(e => e.UserId == currentUserId)
+                          .ToListAsync();
+    }
+
+    private async Task SaveEntry()
+    {
+        newEntry.UserId = currentUserId;
+        newEntry.DateCreated = DateTime.Now;
+        Db.JournalEntries.Add(newEntry);
+        await Db.SaveChangesAsync();
+
+        entries.Insert(0, newEntry);
+        newEntry = new JournalEntry();
+    }
+}

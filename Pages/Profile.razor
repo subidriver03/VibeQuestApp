@@ -1,0 +1,46 @@
+﻿@inherits ProtectedPageBase
+@page "/profile"
+@using VibeQuestApp.Data
+@using VibeQuestApp.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Db
+
+
+<h3>Welcome, @hero?.HeroName!</h3>
+
+@if (hero == null)
+{
+    <p>Loading your profile...</p>
+}
+else
+{
+    <div class="card" style="max-width: 500px;">
+        @if (!string.IsNullOrWhiteSpace(hero.AvatarUrl))
+        {
+            <img src="@hero.AvatarUrl" alt="Your Avatar" class="card-img-top" style="max-height: 250px;" />
+        }
+
+        <div class="card-body">
+            <p><strong>Email:</strong> @user?.Email</p>
+            <p><strong>Hero Name:</strong> @hero.HeroName</p>
+            <p><strong>Life Focus Areas:</strong> @hero.LifeFocusAreas</p>
+            <p><strong>Primary Goals:</strong> @hero.PrimaryGoals</p>
+            <p><strong>Long-Term Vision:</strong> @hero.LongTermVision</p>
+            <p><strong>Motivation Style:</strong> @hero.MotivationStyle</p>
+            <p><strong>Commitment Level:</strong> @hero.CommitmentLevel</p>
+            <p><strong>Daily Reset Time:</strong> @hero.DailyResetTime</p>
+        </div>
+    </div>
+}
+
+@code {
+    private int currentUserId = 1; // TEMP: replace with real user login ID
+    private HeroProfile? hero;
+    private User? user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hero = await Db.HeroProfiles.FirstOrDefaultAsync(h => h.UserId == currentUserId);
+        user = await Db.Users.FirstOrDefaultAsync(u => u.Id == currentUserId);
+    }
+}
