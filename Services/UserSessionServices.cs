@@ -4,24 +4,24 @@ namespace VibeQuestApp.Services
 {
     public class UserSessionService
     {
-        public User? CurrentUser { get; private set; }
-
-        public bool IsLoggedIn => CurrentUser != null;
-
         public event Action? OnChange;
 
-        public void SetUser(User? user)
+        private User? _currentUser;
+        public User? CurrentUser => _currentUser;
+
+        public bool IsLoggedIn => _currentUser != null;
+
+        public void SetUser(User user)
         {
-            CurrentUser = user;
-            NotifyStateChanged();
+            _currentUser = user;
+            OnChange?.Invoke();
         }
 
-        public void Logout()
+        public void ClearUser()
         {
-            CurrentUser = null;
-            NotifyStateChanged();
+            _currentUser = null;
+            OnChange?.Invoke();
         }
-
-        private void NotifyStateChanged() => OnChange?.Invoke();
     }
 }
+

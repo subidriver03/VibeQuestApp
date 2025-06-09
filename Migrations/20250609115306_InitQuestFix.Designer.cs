@@ -11,8 +11,8 @@ using VibeQuestApp.Data;
 namespace VibeQuestApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250609035348_ExpandHeroProfile")]
-    partial class ExpandHeroProfile
+    [Migration("20250609115306_InitQuestFix")]
+    partial class InitQuestFix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,14 +30,40 @@ namespace VibeQuestApp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CommitmentLevel")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("CurrentXP")
                         .HasColumnType("INTEGER");
+
+                    b.Property<TimeSpan>("DailyResetTime")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("HeroName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Level")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LifeFocusAreas")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LongTermVision")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MotivationStyle")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PrimaryGoals")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TotalXP")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("UserId")
@@ -50,28 +76,68 @@ namespace VibeQuestApp.Migrations
                     b.ToTable("HeroProfiles");
                 });
 
+            modelBuilder.Entity("VibeQuestApp.Models.JournalEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JournalEntries");
+                });
+
             modelBuilder.Entity("VibeQuestApp.Models.Quest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Category")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("DueDate")
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DueDate")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Priority")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("XPValue")
+                    b.Property<int>("XpReward")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

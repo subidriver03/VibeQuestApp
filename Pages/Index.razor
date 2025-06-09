@@ -1,18 +1,22 @@
 ﻿@page "/"
 @inject NavigationManager NavigationManager
 @inject VibeQuestApp.Services.UserSessionService Session
+@using VibeQuestApp.Services
+@inject UserSessionService Session
+
 
 @implements IDisposable
 
 <PageTitle>Begin Your Adventure</PageTitle>
-<div style="text-align: center; margin-top: 100px;"/>
+
+<div style="text-align: center; margin-top: 100px;">
     <h1>Embark on your Quest with VibeQuest</h1>
     <p>Gamify your personal development journey.</p>
 
     <div style="margin-top: 30px;">
         @if (!Session.IsLoggedIn)
         {
-            <button class="btn btn-success btn-lg" @onclick="StartCharacterCreation">
+            <button class="btn btn-success btn-lg" @onclick="@(() => NavigationManager.NavigateTo("/login"))">
                 Start Your Quest!
             </button>
 
@@ -29,13 +33,9 @@
             </button>
         }
     </div>
+</div>
 
 @code {
-    private void StartCharacterCreation()
-    {
-        NavigationManager.NavigateTo("/hero-customize");
-    }
-
     protected override void OnInitialized()
     {
         Session.OnChange += StateHasChanged;

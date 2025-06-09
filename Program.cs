@@ -1,8 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using VibeQuestApp.Data;
 using VibeQuestApp.Models;
 using VibeQuestApp.Services;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,36 +9,52 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<QuestService>();
-
+builder.Services.AddScoped<UserSessionService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Use Scoped for per-user session management
-builder.Services.AddScoped<UserSessionService>();
+var app = builder.Build(); // ← MUST come before using (var scope...)
 
-var app = builder.Build();
-
-// Configure middleware
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
+// 🔽 SEEDING BLOCK GOES HERE 🔽
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated(); // Creates DB if not exists
+    db.Database.EnsureCreated();
 
     if (!db.Users.Any())
     {
-        db.Users.Add(new User
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword("1234");
+        var user = new User
         {
             Email = "test@example.com",
-            PasswordHash = "1234"
-        });
+            PasswordHash = hashedPassword
+        };
+
+        db.Users.Add(user);
+        db.SaveChanges();
+
+        var heroProfile = new HeroProfile
+        {
+            UserId = user.Id,
+            HeroName = "Test1",
+            AvatarUrl = "/uploads/test.jpeg", // Ensure this file exists
+            LifeFocusAreas = "Health, Creativity, Personal Development",
+            PrimaryGoals = "test1",
+            LongTermVision = "test2",
+            MotivationStyle = "Rewards",
+            CommitmentLevel = "Casual",
+            DailyResetTime = TimeSpan.FromHours(4),
+            Level = 1,
+            CurrentXP = 0,
+            TotalXP = 0
+        };
+
+        db.HeroProfiles.Add(heroProfile);
         db.SaveChanges();
     }
 }
+
+// Middleware & Routing
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

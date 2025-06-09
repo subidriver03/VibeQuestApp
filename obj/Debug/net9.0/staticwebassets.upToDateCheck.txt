@@ -11,8 +11,8 @@ wwwroot\css\open-iconic\ICON-LICENSE
 wwwroot\css\open-iconic\README.md
 wwwroot\css\site.css
 wwwroot\favicon.ico
-wwwroot\uploads\446defeb-82ce-41c0-a384-e87e4b2abf4f.jpeg
-wwwroot\uploads\57f213e2-3dcf-41a0-8ecf-e49a7f42b4ed.jpeg
+wwwroot\uploads\7fe4ab95-4c74-4a48-8724-858523ab9934.jpeg
+wwwroot\uploads\test.jpeg
 C:\Users\subid\source\repos\VibeQuestApp\wwwroot\favicon.ico
 C:\Users\subid\source\repos\VibeQuestApp\wwwroot\css\site.css
 C:\Users\subid\source\repos\VibeQuestApp\wwwroot\css\open-iconic\README.md

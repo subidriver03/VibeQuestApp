@@ -318,7 +318,6 @@ SQLite schema includes tables for: Users, Tasks, SkillProgress, and JournalEntri
 ### 🔐 Auth Behavior
 - Login.razor and Register.razor forms allow user setup
 - Login sets the Session.CurrentUser and redirects to /profile
-- Authenticated-only pages (like /profile, /journal, etc.) inherit from ProtectedPageBase
 - /hero-customize bypasses auth for onboarding
 
 ---

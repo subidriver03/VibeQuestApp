@@ -1,11 +1,13 @@
-﻿@inherits ProtectedPageBase
-@page "/quests"
+﻿@page "/quests"
 @using Microsoft.EntityFrameworkCore
 @using VibeQuestApp.Models
 @using VibeQuestApp.Data
 @using VibeQuestApp.Services
 @inject AppDbContext Db
-@inject QuestService QuestService
+@inject VibeQuestApp.Services.UserSessionService Session
+@inject VibeQuestApp.Services.QuestService QuestService
+
+
 
 <h3>Quest Board</h3>
 <p>Complete daily quests to earn XP and level up!</p>
