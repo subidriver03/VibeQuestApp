@@ -33,7 +33,14 @@ else
 
         @if (!string.IsNullOrWhiteSpace(heroProfile.AvatarUrl))
         {
-            <img src="@heroProfile.AvatarUrl" alt="Avatar Preview" style="max-height: 120px; margin: 10px 0;" />
+            <div style="margin-top: 10px;">
+                <img src="@heroProfile.AvatarUrl"
+                     alt="Current Avatar"
+                     class="img-thumbnail"
+                     style="max-height: 120px;"
+                     onerror="this.src='/images/default-avatar.png'" />
+                <p><small>Current avatar preview</small></p>
+            </div>
         }
 
         <div>
@@ -158,23 +165,19 @@ else
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
     {
         uploadedFile = e.File;
-        var ext = Path.GetExtension(uploadedFile.Name);
-        var fileName = $"{Guid.NewGuid()}{ext}";
-
-        if (Env?.WebRootPath is null)
-        {
-            throw new InvalidOperationException("WebRootPath is not configured.");
-        }
+        var fileName = Path.GetFileName(uploadedFile.Name); // Use original filename
 
         var savePath = Path.Combine(Env.WebRootPath, "uploads", fileName);
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
-        await using FileStream fs = new(savePath, FileMode.Create);
-        await uploadedFile.OpenReadStream().CopyToAsync(fs);
+        await using var fs = new FileStream(savePath, FileMode.Create);
+        await uploadedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(fs); // 10MB max
 
-        if (heroProfile != null)
+        if (heroProfile is not null)
         {
             heroProfile.AvatarUrl = $"/uploads/{fileName}";
+            Db.HeroProfiles.Update(heroProfile);
+            await Db.SaveChangesAsync();
         }
     }
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 using VibeQuestApp.Data;
 using VibeQuestApp.Models;
 using VibeQuestApp.Services;
@@ -7,15 +9,28 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Register services
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+
+builder.Services.AddServerSideBlazor()
+    .AddHubOptions(options =>
+    {
+        options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10MB upload limit for SignalR
+    });
+
+// ✅ Set multipart upload limit for InputFile
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB upload limit for file uploads
+});
+
 builder.Services.AddScoped<QuestService>();
 builder.Services.AddScoped<UserSessionService>();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-var app = builder.Build(); // ← MUST come before using (var scope...)
+var app = builder.Build();
 
-// 🔽 SEEDING BLOCK GOES HERE 🔽
+// Database seeding
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -37,7 +52,7 @@ using (var scope = app.Services.CreateScope())
         {
             UserId = user.Id,
             HeroName = "Test1",
-            AvatarUrl = "/uploads/test.jpeg", // Ensure this file exists
+            AvatarUrl = "/uploads/test.jpeg", // ⚠️ Make sure this image physically exists!
             LifeFocusAreas = "Health, Creativity, Personal Development",
             PrimaryGoals = "test1",
             LongTermVision = "test2",
@@ -54,7 +69,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Middleware & Routing
+// Middleware
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
