@@ -40,8 +40,7 @@
     {
         Logger.LogDebug("Attempting login for email: {Email}", loginModel.Email);
 
-        var user = await Db.Users
-            .FirstOrDefaultAsync(u => u.Email == loginModel.Email);
+        var user = await Db.Users.FirstOrDefaultAsync(u => u.Email == loginModel.Email);
 
         if (user != null)
         {

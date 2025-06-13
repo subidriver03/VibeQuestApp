@@ -11,11 +11,12 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute("Bootstrap5")]
 [assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("88ba15fa-0a25-4040-ab3b-07c4e7da1dca")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("VibeQuestApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+418a55ca66176f92da4dc3daa05d39ebc028c0bf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+079822220b998bd3eecb6786c0da39e8ef6d5ed3")]
 [assembly: System.Reflection.AssemblyProductAttribute("VibeQuestApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VibeQuestApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

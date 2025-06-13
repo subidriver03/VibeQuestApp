@@ -118,6 +118,8 @@ else
     private bool showCreateForm = false;
     private HashSet<int> hiddenCompletedIds = new();
 
+    private string? currentUserId => Session.CurrentUser?.Id;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadQuests();
@@ -125,9 +127,10 @@ else
 
     private async Task LoadQuests()
     {
-        var userId = Session.CurrentUser?.Id ?? 0;
+        if (currentUserId == null) return;
+
         quests = await Db.Quests
-            .Where(q => q.UserId == userId)
+            .Where(q => q.UserId == currentUserId)
             .OrderByDescending(q => q.IsCompleted)
             .ThenBy(q => q.DueDate)
             .ToListAsync();
@@ -135,8 +138,9 @@ else
 
     private async Task CompleteQuest(int questId)
     {
-        var userId = Session.CurrentUser?.Id ?? 0;
-        bool success = await QuestService.CompleteQuestAsync(questId, userId);
+        if (currentUserId == null) return;
+
+        bool success = await QuestService.CompleteQuestAsync(questId, currentUserId);
 
         if (success)
         {
@@ -146,7 +150,9 @@ else
 
     private async Task CreateQuest()
     {
-        newQuest.UserId = Session.CurrentUser?.Id ?? 0;
+        if (currentUserId == null) return;
+
+        newQuest.UserId = currentUserId;
         newQuest.IsCompleted = false;
         Db.Quests.Add(newQuest);
         await Db.SaveChangesAsync();

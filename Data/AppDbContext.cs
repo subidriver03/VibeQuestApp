@@ -1,17 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VibeQuestApp.Models;
+
 namespace VibeQuestApp.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public DbSet<User> Users => Set<User>();
+        public DbSet<HeroProfile> HeroProfiles => Set<HeroProfile>();
+        public DbSet<Quest> Quests => Set<Quest>();
+        public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+            // Add custom configurations here if needed
         }
-
-        public DbSet<User> Users { get; set; }
-        public DbSet<HeroProfile> HeroProfiles { get; set; }
-        public DbSet<Quest> Quests { get; set; }
-        public DbSet<JournalEntry> JournalEntries { get; set; }
     }
-
 }

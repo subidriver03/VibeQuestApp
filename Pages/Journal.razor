@@ -67,7 +67,7 @@ else
     private List<JournalEntry> entries = new();
     private JournalEntry newEntry = new();
     private HeroProfile? profile;
-    private int currentUserId => Session.CurrentUser?.Id ?? 0;
+    private string? currentUserId => Session.CurrentUser?.Id;
 
     private string? prompt;
     private int currentStreak = 0;
@@ -88,6 +88,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        if (currentUserId == null)
+        {
+            return;
+        }
+
         prompt = prompts[new Random().Next(prompts.Length)];
 
         entries = await Db.JournalEntries
@@ -103,13 +108,15 @@ else
 
     private async Task SaveEntry()
     {
+        if (currentUserId == null)
+            return;
+
         newEntry.UserId = currentUserId;
         newEntry.DateCreated = DateTime.Now;
         Db.JournalEntries.Add(newEntry);
 
         if (profile != null)
         {
-            // Grant daily XP only if this is the first journal entry for today
             bool isFirstToday = !entries.Any(e => e.DateCreated.Date == DateTime.Today);
 
             profile.CurrentXP += dailyXp;

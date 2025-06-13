@@ -36,7 +36,7 @@
                 <NavLink class="nav-link" href="/reward-store">Reward Store</NavLink>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-danger" href="#" @onclick="@(() => Logout())">Logout</a>
+                <a class="nav-link text-danger" href="#" @onclick="Logout">Logout</a>
             </li>
         }
     </ul>
@@ -45,7 +45,7 @@
 @code {
     private void Logout()
     {
-        Session.SetUser(null);
+        Session.SetUser(null!); // use null-forgiving operator to suppress warning
         NavigationManager.NavigateTo("/");
     }
 

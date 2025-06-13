@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VibeQuestApp.Data;
 using VibeQuestApp.Models;
@@ -12,19 +13,28 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddHubOptions(options =>
     {
-        options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10MB for SignalR
+        options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10MB
     });
 
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB for file uploads
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
 });
 
-builder.Services.AddScoped<QuestService>();
-builder.Services.AddScoped<UserSessionService>();
-
+// Add EF Core
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Identity (using basic User model)
+builder.Services.AddDefaultIdentity<User>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddEntityFrameworkStores<AppDbContext>();
+
+// Custom services
+builder.Services.AddScoped<QuestService>();
+builder.Services.AddScoped<UserSessionService>();
 
 var app = builder.Build();
 
@@ -32,61 +42,61 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    db.Database.Migrate();
+
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
     if (!db.Users.Any())
     {
-        var hashedPassword = BCrypt.Net.BCrypt.HashPassword("1234");
-        var user = new User
+        var testUser = new User
         {
-            Email = "test@example.com",
-            PasswordHash = hashedPassword
+            UserName = "test@example.com",
+            Email = "test@example.com"
         };
 
-        db.Users.Add(user);
-        db.SaveChanges();
+        var result = await userManager.CreateAsync(testUser, "1234");
 
-        var heroProfile = new HeroProfile
+        if (result.Succeeded)
         {
-            UserId = user.Id,
-            HeroName = "Test1",
-            AvatarUrl = "/uploads/test.jpeg",
-            LifeFocusAreas = "Health, Creativity, Personal Development",
-            PrimaryGoals = "test1",
-            LongTermVision = "test2",
-            MotivationStyle = "Rewards",
-            CommitmentLevel = "Casual",
-            DailyResetTime = TimeSpan.FromHours(4),
-            Level = 1,
-            CurrentXP = 0,
-            TotalXP = 0
-        };
-
-        db.HeroProfiles.Add(heroProfile);
-
-        // Seed a couple of quests
-        db.Quests.AddRange(
-            new Quest
+            db.HeroProfiles.Add(new HeroProfile
             {
-                UserId = user.Id,
-                Title = "Complete your first quest",
-                Description = "Mark this task as done to earn XP!",
-                XpReward = 50,
-                DueDate = DateTime.Today.AddDays(1),
-                IsCompleted = false
-            },
-            new Quest
-            {
-                UserId = user.Id,
-                Title = "Check your profile",
-                Description = "Make sure your hero info is filled out.",
-                XpReward = 30,
-                DueDate = DateTime.Today.AddDays(2),
-                IsCompleted = false
-            }
-        );
+                UserId = testUser.Id,
+                HeroName = "Test1",
+                AvatarUrl = "/uploads/test.jpeg",
+                LifeFocusAreas = "Health, Creativity, Personal Development",
+                PrimaryGoals = "test1",
+                LongTermVision = "test2",
+                MotivationStyle = "Rewards",
+                CommitmentLevel = "Casual",
+                DailyResetTime = TimeSpan.FromHours(4),
+                Level = 1,
+                CurrentXP = 0,
+                TotalXP = 0
+            });
 
-        db.SaveChanges();
+            db.Quests.AddRange(
+                new Quest
+                {
+                    UserId = testUser.Id,
+                    Title = "Complete your first quest",
+                    Description = "Mark this task as done to earn XP!",
+                    XpReward = 50,
+                    DueDate = DateTime.Today.AddDays(1),
+                    IsCompleted = false
+                },
+                new Quest
+                {
+                    UserId = testUser.Id,
+                    Title = "Check your profile",
+                    Description = "Make sure your hero info is filled out.",
+                    XpReward = 30,
+                    DueDate = DateTime.Today.AddDays(2),
+                    IsCompleted = false
+                }
+            );
+
+            db.SaveChanges();
+        }
     }
 }
 
@@ -94,6 +104,9 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

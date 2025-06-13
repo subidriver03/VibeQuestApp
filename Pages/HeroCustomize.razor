@@ -119,13 +119,13 @@ else
         }
     }
 
-    private int currentUserId = 1;
+    private string currentUserId = "1"; // TEMP ID for testing
 
     protected override async Task OnInitializedAsync()
     {
         if (!await Db.Users.AnyAsync(u => u.Id == currentUserId))
         {
-            Db.Users.Add(new User { Id = currentUserId, Email = "test@vibequest.com", PasswordHash = "temp" });
+            Db.Users.Add(new User { Id = currentUserId, Email = "test@vibequest.com", UserName = "test@vibequest.com" });
             await Db.SaveChangesAsync();
         }
 
@@ -165,13 +165,13 @@ else
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
     {
         uploadedFile = e.File;
-        var fileName = Path.GetFileName(uploadedFile.Name); // Use original filename
+        var fileName = Path.GetFileName(uploadedFile.Name);
 
         var savePath = Path.Combine(Env.WebRootPath, "uploads", fileName);
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
         await using var fs = new FileStream(savePath, FileMode.Create);
-        await uploadedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(fs); // 10MB max
+        await uploadedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(fs);
 
         if (heroProfile is not null)
         {

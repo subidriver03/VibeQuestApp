@@ -6,17 +6,14 @@ using VibeQuestApp.Models;
 
 namespace VibeQuestApp.Services
 {
-    public class QuestService
+    public class QuestService(AppDbContext db)
     {
-        private readonly AppDbContext _db;
+        private readonly AppDbContext _db = db;
 
-        public QuestService(AppDbContext db)
+        public async Task<bool> CompleteQuestAsync(int questId, string userId)
         {
-            _db = db;
-        }
+            if (string.IsNullOrEmpty(userId)) return false;
 
-        public async Task<bool> CompleteQuestAsync(int questId, int userId)
-        {
             var quest = await _db.Quests.FirstOrDefaultAsync(q => q.Id == questId && q.UserId == userId);
             var profile = await _db.HeroProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
@@ -33,7 +30,7 @@ namespace VibeQuestApp.Services
             return true;
         }
 
-        private int CalculateLevel(int totalXP)
+        private static int CalculateLevel(int totalXP)
         {
             return (int)Math.Floor(Math.Sqrt(totalXP / 100.0)) + 1;
         }

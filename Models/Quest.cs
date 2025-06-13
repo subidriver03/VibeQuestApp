@@ -22,7 +22,7 @@ namespace VibeQuestApp.Models
 
         public DateTime? DueDate { get; set; }
 
-        public int UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
 
         // Optional: Add priority or badge if you want visual sorting
         public string? Priority { get; set; }  // e.g., Low, Medium, High

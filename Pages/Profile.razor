@@ -4,49 +4,43 @@
 @using Microsoft.EntityFrameworkCore
 @inject AppDbContext Db
 
-<h3>Welcome, @hero?.HeroName!</h3>
+<h3>Hero Profile</h3>
 
-@if (hero == null)
+@if (heroProfile == null)
 {
-    <p>Loading your profile...</p>
+    <p>Loading profile...</p>
 }
 else
 {
-    <div class="card p-3" style="max-width: 900px;">
-        <div class="d-flex align-items-start gap-4">
-            @if (!string.IsNullOrWhiteSpace(hero.AvatarUrl))
-            {
-                <img src="@hero.AvatarUrl"
-                     alt="Your Avatar"
-                     class="rounded"
-                     style="transform: scale(0.5); transform-origin: top left;" />
-            }
+    <div class="card p-3">
+        @if (!string.IsNullOrWhiteSpace(heroProfile.AvatarUrl))
+        {
+            <img src="@heroProfile.AvatarUrl"
+                 alt="Hero Avatar"
+                 class="img-thumbnail mb-3"
+                 style="max-height: 150px;"
+                 onerror="this.src='/images/default-avatar.png'" />
+        }
 
-            <div>
-                <p><strong>Email:</strong> @user?.Email</p>
-                <p><strong>Hero Name:</strong> @hero.HeroName</p>
-                <p><strong>Level:</strong> @hero.Level</p>
-                <p><strong>Current XP:</strong> @hero.CurrentXP</p>
-                <p><strong>Total XP:</strong> @hero.TotalXP</p>
-                <p><strong>Life Focus Areas:</strong> @hero.LifeFocusAreas</p>
-                <p><strong>Primary Goals:</strong> @hero.PrimaryGoals</p>
-                <p><strong>Long-Term Vision:</strong> @hero.LongTermVision</p>
-                <p><strong>Motivation Style:</strong> @hero.MotivationStyle</p>
-                <p><strong>Commitment Level:</strong> @hero.CommitmentLevel</p>
-                <p><strong>Daily Reset Time:</strong> @hero.DailyResetTime</p>
-            </div>
-        </div>
+        <h4>@heroProfile.HeroName</h4>
+        <p><strong>Level:</strong> @heroProfile.Level</p>
+        <p><strong>Total XP:</strong> @heroProfile.TotalXP</p>
+        <p><strong>Focus Areas:</strong> @heroProfile.LifeFocusAreas</p>
+        <p><strong>Primary Goals:</strong> @heroProfile.PrimaryGoals</p>
+        <p><strong>Long-Term Vision:</strong> @heroProfile.LongTermVision</p>
+        <p><strong>Motivation Style:</strong> @heroProfile.MotivationStyle</p>
+        <p><strong>Commitment Level:</strong> @heroProfile.CommitmentLevel</p>
+        <p><strong>Daily Reset Time:</strong> @heroProfile.DailyResetTime.ToString(@"hh\:mm")</p>
     </div>
 }
 
 @code {
-    private int currentUserId = 1; // TEMP: replace with real user login ID
-    private HeroProfile? hero;
-    private User? user;
+    private HeroProfile? heroProfile;
+    private string currentUserId = "1"; // TEMP for testing until real authentication
 
     protected override async Task OnInitializedAsync()
     {
-        hero = await Db.HeroProfiles.FirstOrDefaultAsync(h => h.UserId == currentUserId);
-        user = await Db.Users.FirstOrDefaultAsync(u => u.Id == currentUserId);
+        heroProfile = await Db.HeroProfiles
+            .FirstOrDefaultAsync(p => p.UserId == currentUserId);
     }
 }

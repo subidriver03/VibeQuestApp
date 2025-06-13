@@ -1,8 +1,8 @@
 ﻿@page "/register"
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.EntityFrameworkCore
 @using VibeQuestApp.Data
 @using VibeQuestApp.Models
-@using Microsoft.EntityFrameworkCore
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
 
@@ -19,21 +19,21 @@
 
     <div>
         <label>Email:</label><br />
-        <InputText @bind-Value="registrationModel.Email" />
+        <InputText @bind-Value="registrationModel.Email" class="form-control" />
     </div>
 
     <div>
         <label>Password:</label><br />
-        <InputText @bind-Value="registrationModel.Password" type="password" />
+        <InputText @bind-Value="registrationModel.Password" type="password" class="form-control" />
     </div>
 
     <div>
         <label>Confirm Password:</label><br />
-        <InputText @bind-Value="registrationModel.ConfirmPassword" type="password" />
+        <InputText @bind-Value="registrationModel.ConfirmPassword" type="password" class="form-control" />
     </div>
 
     <br />
-    <button type="submit">Register</button>
+    <button type="submit" class="btn btn-primary">Register</button>
 </EditForm>
 
 @code {
@@ -72,12 +72,21 @@
         Db.Users.Add(user);
         await Db.SaveChangesAsync();
 
-        // Create empty HeroProfile tied to new user
+        // Create default HeroProfile for new user
         var profile = new HeroProfile
         {
             UserId = user.Id,
-            HeroName = "",
-            AvatarUrl = ""
+            HeroName = "New Hero",
+            AvatarUrl = "",
+            LifeFocusAreas = "",
+            PrimaryGoals = "",
+            LongTermVision = "",
+            MotivationStyle = "",
+            CommitmentLevel = "",
+            DailyResetTime = TimeSpan.FromHours(4),
+            Level = 1,
+            CurrentXP = 0,
+            TotalXP = 0
         };
 
         Db.HeroProfiles.Add(profile);

@@ -1,11 +1,10 @@
-using System;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace VibeQuestApp.Models
 {
-    public class User
+    public class User : IdentityUser
     {
-        public int Id { get; set; }
-        public string Email { get; set; } = string.Empty;
-        public string PasswordHash { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public string AvatarUrl { get; set; } = string.Empty;
     }
 }

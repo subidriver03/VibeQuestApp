@@ -1,8 +1,13 @@
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace VibeQuestApp.Models
 {
     public class HeroProfile
     {
-        public int Id { get; set; }
+        [Key]
+        public int Id { get; set; }  // ✅ Primary Key for EF Core
+
         public string HeroName { get; set; } = string.Empty;
         public string AvatarUrl { get; set; } = string.Empty;
         public string LifeFocusAreas { get; set; } = string.Empty;
@@ -14,14 +19,12 @@ namespace VibeQuestApp.Models
 
         public int Level { get; set; } = 1;
         public int CurrentXP { get; set; } = 0;
+        public int TotalXP { get; set; } = 0;
 
-        public int UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
         public User User { get; set; } = default!;
-        public int TotalXP { get; set; } // This tracks the user's current XP
+
         public int JournalStreak { get; set; } = 0;
         public DateTime? LastJournalEntryDate { get; set; }
-
-
     }
-
 }
