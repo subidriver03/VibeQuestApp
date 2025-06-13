@@ -342,3 +342,65 @@ SQLite schema includes tables for: Users, Tasks, SkillProgress, and JournalEntri
 - The app is **for beginners**, so all features must remain **intuitive and motivating**
 - Gamified behavior should reinforce consistency, progress, and personal wins
 - The app should reward effort — even small, consistent wins earn XP and visual feedback
+
+# 📌 Version 1.5 – Onboarding Flow Overhaul  
+**Date:** 2025-06-13  
+**Author:** Vibe Rantz  
+
+---
+
+## 🔄 Changelog
+
+| Date       | Version | Author      | Description                                                                 |
+|------------|---------|-------------|-----------------------------------------------------------------------------|
+| 2025-06-13 | 1.5     | Vibe Rantz  | Redesigned onboarding flow with multi-step navigation and form validation  |
+| 2025-06-13 | 1.5     | Vibe Rantz  | Integrated full Hero + User creation with session login                    |
+| 2025-06-13 | 1.5     | Vibe Rantz  | “Finish” button now conditionally triggers form submission + success route |
+
+---
+
+## 📋 Functional Requirements – Onboarding (New)
+
+- **FR-18:** The system shall guide new users through a 3-step onboarding process:  
+  1. Hero creation  
+  2. Vision setup  
+  3. Account registration  
+
+- **FR-19:** The onboarding steps shall maintain centralized state via `OnboardingStateService`.  
+- **FR-20:** Submitting the final step shall persist both user credentials and hero profile, then route to `/success`.  
+- **FR-21:** The “Finish” button will only complete registration if all form data is valid and unique.  
+- **FR-22:** Hero avatars can be uploaded and saved locally during Step 1.
+
+---
+
+## 🚀 System Features – Onboarding Upgrade
+
+### 2.11 – Multi-Step Onboarding Flow  
+**Description:**  
+A linear 3-step process (`Step1HeroCreation`, `Step2VisionSetup`, `Step3AccountSetup`) with back/next navigation and centralized state.
+
+- **Inputs:** Hero name, avatar image, focus areas, vision goals, email, password  
+- **Outputs:** Persisted user + hero profile, automatic login, session set, redirect to success screen  
+
+**Priority:** Critical (1st-time user experience)  
+**Dependencies:** `OnboardingStateService`, `AppDbContext`, `UserSessionService`, `NavigationManager`
+
+---
+
+## 🛠️ Architecture Notes
+
+- **Shared State:** `OnboardingStateService` holds data across all 3 onboarding components.
+- **EventCallback Handling:** Final form in `Step3AccountSetup` exposes a `SubmitFormAsync()` method called from the parent onboarding page.
+- **Ref Management:** Step 3 is referenced via `@ref` and only called when the user is on the final step.
+- **Validation:** All inputs are validated before navigation. Errors halt progress and display inline.
+
+---
+
+## 🔐 Session & Auth Flow
+
+- Upon successful registration, `Session.SetUser()` is triggered with the new user's info.
+- `NavigationManager.NavigateTo("/success")` only fires if user and hero were both saved successfully.
+- Auth is bypassed only for onboarding pages. After success, full login flow takes over.
+
+---
+
