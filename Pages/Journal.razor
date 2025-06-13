@@ -17,24 +17,24 @@
     </blockquote>
 }
 
-@if (alreadySubmittedToday)
-{
-    <div class="alert alert-info">
-        You've already submitted a journal entry today. Keep up the great work!
-    </div>
-}
-
 <div class="mb-3">
     <label>Mood:</label>
-    <InputSelect @bind-Value="newEntry.Mood" class="form-select mb-2" TValue="string">
+    <InputSelect @bind-Value="newEntry.Mood" @onchange="OnMoodChanged" class="form-select mb-2" TValue="string">
         <option value="">-- Select Mood --</option>
         <option>Happy</option>
         <option>Neutral</option>
         <option>Stressed</option>
     </InputSelect>
 
+    @if (!string.IsNullOrWhiteSpace(moodMessage))
+    {
+        <div class="alert alert-secondary">
+            <em>@moodMessage</em>
+        </div>
+    }
+
     <textarea class="form-control" @bind="newEntry.Content" placeholder="Write your thoughts here..." rows="5"></textarea>
-    <button class="btn btn-primary mt-2" @onclick="SaveEntry" disabled="@alreadySubmittedToday">Save Entry</button>
+    <button class="btn btn-primary mt-2" @onclick="SaveEntry">Save Entry</button>
 </div>
 
 <hr />
@@ -70,9 +70,9 @@ else
     private int currentUserId => Session.CurrentUser?.Id ?? 0;
 
     private string? prompt;
-    private bool alreadySubmittedToday = false;
     private int currentStreak = 0;
     private int xpEarned = 0;
+    private string? moodMessage;
 
     private readonly int dailyXp = 10;
     private readonly int weeklyBonusXp = 50;
@@ -97,7 +97,6 @@ else
 
         profile = await Db.HeroProfiles.FirstOrDefaultAsync(h => h.UserId == currentUserId);
 
-        alreadySubmittedToday = entries.Any(e => e.DateCreated.Date == DateTime.Today);
         currentStreak = CalculateStreak();
         xpEarned = entries.Count * dailyXp + (currentStreak / 7) * weeklyBonusXp;
     }
@@ -105,15 +104,18 @@ else
     private async Task SaveEntry()
     {
         newEntry.UserId = currentUserId;
-        newEntry.DateCreated = DateTime.Today;
+        newEntry.DateCreated = DateTime.Now;
         Db.JournalEntries.Add(newEntry);
 
         if (profile != null)
         {
+            // Grant daily XP only if this is the first journal entry for today
+            bool isFirstToday = !entries.Any(e => e.DateCreated.Date == DateTime.Today);
+
             profile.CurrentXP += dailyXp;
             profile.TotalXP += dailyXp;
 
-            if ((CalculateStreak() + 1) % 7 == 0)
+            if (isFirstToday && (CalculateStreak() + 1) % 7 == 0)
             {
                 profile.CurrentXP += weeklyBonusXp;
                 profile.TotalXP += weeklyBonusXp;
@@ -126,26 +128,45 @@ else
         await Db.SaveChangesAsync();
         entries.Insert(0, newEntry);
         newEntry = new JournalEntry();
-        alreadySubmittedToday = true;
         currentStreak = CalculateStreak();
+        moodMessage = null;
+    }
+
+    private void OnMoodChanged(ChangeEventArgs e)
+    {
+        var selectedMood = e.Value?.ToString();
+        newEntry.Mood = selectedMood;
+
+        moodMessage = selectedMood switch
+        {
+            "Happy" => "That’s wonderful to hear! Keep embracing what brings you joy.",
+            "Neutral" => "Even in stillness, there’s clarity. Reflect on what brought you here today.",
+            "Stressed" => "Take a breath. Writing can help release the pressure—you're not alone.",
+            _ => null
+        };
     }
 
     private int CalculateStreak()
     {
-        var ordered = entries.OrderByDescending(e => e.DateCreated.Date).ToList();
-        if (!ordered.Any()) return 0;
+        var distinctDates = entries
+            .Select(e => e.DateCreated.Date)
+            .Distinct()
+            .OrderByDescending(d => d)
+            .ToList();
+
+        if (!distinctDates.Any()) return 0;
 
         int streak = 0;
         var today = DateTime.Today;
 
-        for (int i = 0; i < ordered.Count; i++)
+        for (int i = 0; i < distinctDates.Count; i++)
         {
             var expectedDate = today.AddDays(-i);
-            if (ordered[i].DateCreated.Date == expectedDate)
+            if (distinctDates[i] == expectedDate)
             {
                 streak++;
             }
-            else if (ordered[i].DateCreated.Date < expectedDate)
+            else
             {
                 break;
             }
