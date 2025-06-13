@@ -1,0 +1,110 @@
+﻿@page "/onboarding/step1"
+@using VibeQuestApp.Models
+@using VibeQuestApp.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject IWebHostEnvironment Env
+
+@code {
+    [Parameter]
+    public OnboardingStateService StateService { get; set; } = default!;
+
+    private string? avatarPreviewUrl;
+
+    private async Task HandleAvatarUpload(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null || file.Size == 0) return;
+
+        var uploadsPath = Path.Combine(Env.WebRootPath, "uploads");
+        if (!Directory.Exists(uploadsPath))
+            Directory.CreateDirectory(uploadsPath);
+
+        var fileName = Path.GetFileName(file.Name);
+        var safeFileName = Path.GetFileNameWithoutExtension(fileName).Replace(" ", "_");
+        var extension = Path.GetExtension(fileName);
+        var finalFileName = $"{safeFileName}{extension}";
+        var fullPath = Path.Combine(uploadsPath, finalFileName);
+
+        int count = 1;
+        while (File.Exists(fullPath))
+        {
+            finalFileName = $"{safeFileName}_{count}{extension}";
+            fullPath = Path.Combine(uploadsPath, finalFileName);
+            count++;
+        }
+
+        await using var fs = File.Create(fullPath);
+        await file.OpenReadStream(maxAllowedSize: 5_000_000).CopyToAsync(fs);
+
+        StateService.HeroProfile.AvatarUrl = $"/uploads/{finalFileName}";
+        avatarPreviewUrl = StateService.HeroProfile.AvatarUrl;
+    }
+
+    private List<string> FocusAreaOptions = new()
+    {
+        "Career Development", "Health & Fitness", "Relationships", "Financial Growth", "Personal Learning"
+    };
+
+    private List<string> GoalOptions = new()
+    {
+        "Build Discipline", "Finish a Project", "Gain Confidence", "Improve Time Management", "Find Balance"
+    };
+
+    private List<string> VisionOptions = new()
+    {
+        "Live with Purpose", "Achieve Mastery", "Inspire Others", "Create a Legacy", "Be Free"
+    };
+}
+
+<h4>Step 1: Create Your Hero</h4>
+
+<EditForm Model="StateService.HeroProfile">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label>Hero Name</label>
+        <InputText class="form-control" @bind-Value="StateService.HeroProfile.HeroName" />
+    </div>
+
+    <div class="mb-3">
+        <label>Life Focus Areas</label>
+        <InputSelect class="form-control" @bind-Value="StateService.HeroProfile.LifeFocusAreas">
+            <option value="">-- Select --</option>
+            @foreach (var option in FocusAreaOptions)
+            {
+                <option value="@option">@option</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Primary Goals</label>
+        <InputSelect class="form-control" @bind-Value="StateService.HeroProfile.PrimaryGoals">
+            <option value="">-- Select --</option>
+            @foreach (var option in GoalOptions)
+            {
+                <option value="@option">@option</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Long-Term Vision</label>
+        <InputSelect class="form-control" @bind-Value="StateService.HeroProfile.LongTermVision">
+            <option value="">-- Select --</option>
+            @foreach (var option in VisionOptions)
+            {
+                <option value="@option">@option</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Upload Avatar</label>
+        <InputFile OnChange="HandleAvatarUpload" class="form-control" />
+        @if (!string.IsNullOrEmpty(avatarPreviewUrl))
+        {
+            <img src="@avatarPreviewUrl" class="img-thumbnail mt-2" style="max-width: 150px;" />
+        }
+    </div>
+</EditForm>

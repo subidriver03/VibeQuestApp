@@ -1,0 +1,65 @@
+﻿@page "/onboarding"
+@using VibeQuestApp.Services
+@using VibeQuestApp.Pages.Onboarding
+@using VibeQuestApp.Models
+@inject NavigationManager NavigationManager
+@inject OnboardingStateService StateService
+
+<h3>Begin Your Quest</h3>
+
+@OnboardingStepDisplay
+
+<div class="mt-3">
+    <button class="btn btn-secondary" @onclick="GoBack" disabled="@IsFirstStep">Back</button>
+    <button class="btn btn-primary" @onclick="GoNext">@NextButtonText</button>
+</div>
+
+@code {
+    private int currentStep = 1;
+    private Step3AccountSetup? step3Component; // Ref to Step3
+
+    private RenderFragment OnboardingStepDisplay => @<div>
+@if (currentStep == 1)
+    {
+    <Step1HeroCreation StateService="StateService" />
+    }
+    else if (currentStep == 2)
+    {
+    <Step2VisionSetup StateService="StateService" />
+    }
+    else if (currentStep == 3)
+    {
+    <Step3AccountSetup @ref="step3Component" StateService="StateService" />
+    }
+</div>;
+
+    private bool IsFirstStep => currentStep == 1;
+    private string NextButtonText => currentStep == 3 ? "Finish" : "Next";
+
+    private async Task GoNext()
+    {
+        if (currentStep < 3)
+        {
+            currentStep++;
+        }
+        else if (currentStep == 3)
+        {
+            if (step3Component != null)
+            {
+                bool success = await step3Component.SubmitFormAsync();
+                if (success)
+                {
+                    NavigationManager.NavigateTo("/success");
+                }
+            }
+        }
+    }
+
+    private void GoBack()
+    {
+        if (currentStep > 1)
+        {
+            currentStep--;
+        }
+    }
+}
