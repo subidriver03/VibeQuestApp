@@ -11,8 +11,8 @@ using VibeQuestApp.Data;
 namespace VibeQuestApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250609115306_InitQuestFix")]
-    partial class InitQuestFix
+    [Migration("20250613004629_AddJournalStreakFields")]
+    partial class AddJournalStreakFields
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,6 +42,12 @@ namespace VibeQuestApp.Migrations
 
                     b.Property<string>("HeroName")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("JournalStreak")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastJournalEntryDate")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Level")
@@ -87,6 +93,9 @@ namespace VibeQuestApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DateCreated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Mood")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")

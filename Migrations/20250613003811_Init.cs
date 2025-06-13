@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VibeQuestApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitQuestFix : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,7 +20,8 @@ namespace VibeQuestApp.Migrations
                     UserId = table.Column<int>(type: "INTEGER", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
-                    Content = table.Column<string>(type: "TEXT", nullable: false)
+                    Content = table.Column<string>(type: "TEXT", nullable: false),
+                    Mood = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

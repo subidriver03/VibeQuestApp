@@ -1,7 +1,0 @@
-C:\Users\subid\source\repos\VibeQuestApp\obj\Debug\net6.0\VibeQuestApp.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\subid\source\repos\VibeQuestApp\obj\Debug\net6.0\VibeQuestApp.AssemblyInfoInputs.cache
-C:\Users\subid\source\repos\VibeQuestApp\obj\Debug\net6.0\VibeQuestApp.AssemblyInfo.cs
-C:\Users\subid\source\repos\VibeQuestApp\obj\Debug\net6.0\VibeQuestApp.csproj.CoreCompileInputs.cache
-C:\Users\subid\source\repos\VibeQuestApp\obj\Debug\net6.0\VibeQuestApp.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\subid\source\repos\VibeQuestApp\obj\Debug\net6.0\VibeQuestApp.RazorAssemblyInfo.cache
-C:\Users\subid\source\repos\VibeQuestApp\obj\Debug\net6.0\VibeQuestApp.RazorAssemblyInfo.cs

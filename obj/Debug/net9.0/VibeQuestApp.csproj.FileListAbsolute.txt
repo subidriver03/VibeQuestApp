@@ -203,4 +203,4 @@ C:\Users\subid\Source\Repos\VibeQuestApp\obj\Debug\net9.0\refint\VibeQuestApp.dl
 C:\Users\subid\Source\Repos\VibeQuestApp\obj\Debug\net9.0\VibeQuestApp.pdb
 C:\Users\subid\Source\Repos\VibeQuestApp\obj\Debug\net9.0\VibeQuestApp.genruntimeconfig.cache
 C:\Users\subid\Source\Repos\VibeQuestApp\obj\Debug\net9.0\ref\VibeQuestApp.dll
-C:\Users\subid\source\repos\VibeQuestApp\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
+C:\Users\subid\Source\Repos\VibeQuestApp\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

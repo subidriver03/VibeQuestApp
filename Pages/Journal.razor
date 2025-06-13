@@ -1,27 +1,58 @@
 ﻿@page "/journal"
 @using VibeQuestApp.Data
 @using VibeQuestApp.Models
+@using VibeQuestApp.Services
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.EntityFrameworkCore.Sqlite
 @inject AppDbContext Db
+@inject UserSessionService Session
 
 <PageTitle>Journal</PageTitle>
 
 <h3>Daily Journal</h3>
 
+@if (!string.IsNullOrEmpty(prompt))
+{
+    <blockquote class="blockquote text-muted">
+        <small><em>Prompt:</em> "@prompt"</small>
+    </blockquote>
+}
+
+@if (alreadySubmittedToday)
+{
+    <div class="alert alert-info">
+        You've already submitted a journal entry today. Keep up the great work!
+    </div>
+}
+
 <div class="mb-3">
+    <label>Mood:</label>
+    <InputSelect @bind-Value="newEntry.Mood" class="form-select mb-2" TValue="string">
+        <option value="">-- Select Mood --</option>
+        <option>Happy</option>
+        <option>Neutral</option>
+        <option>Stressed</option>
+    </InputSelect>
+
     <textarea class="form-control" @bind="newEntry.Content" placeholder="Write your thoughts here..." rows="5"></textarea>
-    <button class="btn btn-primary mt-2" @onclick="SaveEntry">Save Entry</button>
+    <button class="btn btn-primary mt-2" @onclick="SaveEntry" disabled="@alreadySubmittedToday">Save Entry</button>
 </div>
 
-@if (entries?.Any() == true)
+<hr />
+<h5>📈 Journal Stats</h5>
+<ul class="list-group mb-4">
+    <li class="list-group-item">Total Entries: @entries.Count</li>
+    <li class="list-group-item">Current Streak: @currentStreak days</li>
+    <li class="list-group-item">XP Earned from Journaling: @xpEarned</li>
+</ul>
+
+@if (entries.Any())
 {
     <h4>Your Past Entries</h4>
     <ul class="list-group">
         @foreach (var entry in entries.OrderByDescending(e => e.DateCreated))
         {
             <li class="list-group-item">
-                <strong>@entry.DateCreated.ToShortDateString()</strong>
+                <strong>@entry.DateCreated.ToShortDateString()</strong> <span class="badge bg-secondary">@entry.Mood</span>
                 <p>@entry.Content</p>
             </li>
         }
@@ -35,23 +66,91 @@ else
 @code {
     private List<JournalEntry> entries = new();
     private JournalEntry newEntry = new();
-    private int currentUserId = 1; // Replace with actual user ID after login system is complete
+    private HeroProfile? profile;
+    private int currentUserId => Session.CurrentUser?.Id ?? 0;
+
+    private string? prompt;
+    private bool alreadySubmittedToday = false;
+    private int currentStreak = 0;
+    private int xpEarned = 0;
+
+    private readonly int dailyXp = 10;
+    private readonly int weeklyBonusXp = 50;
+
+    private readonly string[] prompts = new[]
+    {
+        "What are you grateful for today?",
+        "What challenge did you overcome recently?",
+        "Describe a moment you felt peace this week.",
+        "What's something you're looking forward to?",
+        "If today was a book chapter, what would its title be?"
+    };
 
     protected override async Task OnInitializedAsync()
     {
+        prompt = prompts[new Random().Next(prompts.Length)];
+
         entries = await Db.JournalEntries
-                          .Where(e => e.UserId == currentUserId)
-                          .ToListAsync();
+            .Where(e => e.UserId == currentUserId)
+            .OrderByDescending(e => e.DateCreated)
+            .ToListAsync();
+
+        profile = await Db.HeroProfiles.FirstOrDefaultAsync(h => h.UserId == currentUserId);
+
+        alreadySubmittedToday = entries.Any(e => e.DateCreated.Date == DateTime.Today);
+        currentStreak = CalculateStreak();
+        xpEarned = entries.Count * dailyXp + (currentStreak / 7) * weeklyBonusXp;
     }
 
     private async Task SaveEntry()
     {
         newEntry.UserId = currentUserId;
-        newEntry.DateCreated = DateTime.Now;
+        newEntry.DateCreated = DateTime.Today;
         Db.JournalEntries.Add(newEntry);
-        await Db.SaveChangesAsync();
 
+        if (profile != null)
+        {
+            profile.CurrentXP += dailyXp;
+            profile.TotalXP += dailyXp;
+
+            if ((CalculateStreak() + 1) % 7 == 0)
+            {
+                profile.CurrentXP += weeklyBonusXp;
+                profile.TotalXP += weeklyBonusXp;
+            }
+
+            profile.Level = (int)Math.Floor(Math.Sqrt(profile.TotalXP / 100.0)) + 1;
+            Db.HeroProfiles.Update(profile);
+        }
+
+        await Db.SaveChangesAsync();
         entries.Insert(0, newEntry);
         newEntry = new JournalEntry();
+        alreadySubmittedToday = true;
+        currentStreak = CalculateStreak();
+    }
+
+    private int CalculateStreak()
+    {
+        var ordered = entries.OrderByDescending(e => e.DateCreated.Date).ToList();
+        if (!ordered.Any()) return 0;
+
+        int streak = 0;
+        var today = DateTime.Today;
+
+        for (int i = 0; i < ordered.Count; i++)
+        {
+            var expectedDate = today.AddDays(-i);
+            if (ordered[i].DateCreated.Date == expectedDate)
+            {
+                streak++;
+            }
+            else if (ordered[i].DateCreated.Date < expectedDate)
+            {
+                break;
+            }
+        }
+
+        return streak;
     }
 }

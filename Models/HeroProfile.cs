@@ -18,6 +18,9 @@ namespace VibeQuestApp.Models
         public int UserId { get; set; }
         public User User { get; set; } = default!;
         public int TotalXP { get; set; } // This tracks the user's current XP
+        public int JournalStreak { get; set; } = 0;
+        public DateTime? LastJournalEntryDate { get; set; }
+
 
     }
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VibeQuestApp.Data;
 
@@ -10,9 +11,11 @@ using VibeQuestApp.Data;
 namespace VibeQuestApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250613003811_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
@@ -39,12 +42,6 @@ namespace VibeQuestApp.Migrations
 
                     b.Property<string>("HeroName")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("JournalStreak")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("LastJournalEntryDate")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Level")

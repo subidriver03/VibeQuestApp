@@ -4390,11 +4390,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\subid\\source\\repos\\VibeQuestApp\\VibeQuestApp.csproj",
+      "projectUniqueName": "C:\\Users\\subid\\Source\\Repos\\VibeQuestApp\\VibeQuestApp.csproj",
       "projectName": "VibeQuestApp",
-      "projectPath": "C:\\Users\\subid\\source\\repos\\VibeQuestApp\\VibeQuestApp.csproj",
+      "projectPath": "C:\\Users\\subid\\Source\\Repos\\VibeQuestApp\\VibeQuestApp.csproj",
       "packagesPath": "C:\\Users\\subid\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\subid\\source\\repos\\VibeQuestApp\\obj\\",
+      "outputPath": "C:\\Users\\subid\\Source\\Repos\\VibeQuestApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
