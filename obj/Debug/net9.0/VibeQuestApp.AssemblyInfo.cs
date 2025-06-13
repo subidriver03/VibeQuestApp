@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VibeQuestApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0adb1ce4aec306a5b2db025ff12b42c3cdac0665")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3d3907049f6c8cf628b913508fc6640a7ee31250")]
 [assembly: System.Reflection.AssemblyProductAttribute("VibeQuestApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VibeQuestApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

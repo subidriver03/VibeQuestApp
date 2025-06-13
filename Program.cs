@@ -9,17 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Register services
 builder.Services.AddRazorPages();
-
 builder.Services.AddServerSideBlazor()
     .AddHubOptions(options =>
     {
-        options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10MB upload limit for SignalR
+        options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10MB for SignalR
     });
 
-// ✅ Set multipart upload limit for InputFile
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB upload limit for file uploads
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB for file uploads
 });
 
 builder.Services.AddScoped<QuestService>();
@@ -30,7 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// Database seeding
+// Seed database
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -52,7 +50,7 @@ using (var scope = app.Services.CreateScope())
         {
             UserId = user.Id,
             HeroName = "Test1",
-            AvatarUrl = "/uploads/test.jpeg", // ⚠️ Make sure this image physically exists!
+            AvatarUrl = "/uploads/test.jpeg",
             LifeFocusAreas = "Health, Creativity, Personal Development",
             PrimaryGoals = "test1",
             LongTermVision = "test2",
@@ -65,6 +63,29 @@ using (var scope = app.Services.CreateScope())
         };
 
         db.HeroProfiles.Add(heroProfile);
+
+        // Seed a couple of quests
+        db.Quests.AddRange(
+            new Quest
+            {
+                UserId = user.Id,
+                Title = "Complete your first quest",
+                Description = "Mark this task as done to earn XP!",
+                XpReward = 50,
+                DueDate = DateTime.Today.AddDays(1),
+                IsCompleted = false
+            },
+            new Quest
+            {
+                UserId = user.Id,
+                Title = "Check your profile",
+                Description = "Make sure your hero info is filled out.",
+                XpReward = 30,
+                DueDate = DateTime.Today.AddDays(2),
+                IsCompleted = false
+            }
+        );
+
         db.SaveChanges();
     }
 }

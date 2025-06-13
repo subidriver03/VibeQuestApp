@@ -4,7 +4,6 @@
 @using Microsoft.EntityFrameworkCore
 @inject AppDbContext Db
 
-
 <h3>Welcome, @hero?.HeroName!</h3>
 
 @if (hero == null)
@@ -13,29 +12,29 @@
 }
 else
 {
-    <div class="card" style="max-width: 500px;">
+    <div class="card p-3" style="max-width: 900px;">
+        <div class="d-flex align-items-start gap-4">
+            @if (!string.IsNullOrWhiteSpace(hero.AvatarUrl))
+            {
+                <img src="@hero.AvatarUrl"
+                     alt="Your Avatar"
+                     class="rounded"
+                     style="transform: scale(0.5); transform-origin: top left;" />
+            }
 
-        @if (!string.IsNullOrWhiteSpace(hero?.AvatarUrl))
-        {
-            <img src="@GetAvatarUrl()" alt="Your Avatar"
-     class="card-img-top"
-     style="max-width: 50%; height: auto; display: block; margin: 0 auto;" />
-
-        }
-        else
-        {
-            <img src="images/default-avatar.png" alt="Default Avatar" class="card-img-top" style="max-height: 250px;" />
-        }
-
-        <div class="card-body">
-            <p><strong>Email:</strong> @user?.Email</p>
-            <p><strong>Hero Name:</strong> @hero.HeroName</p>
-            <p><strong>Life Focus Areas:</strong> @hero.LifeFocusAreas</p>
-            <p><strong>Primary Goals:</strong> @hero.PrimaryGoals</p>
-            <p><strong>Long-Term Vision:</strong> @hero.LongTermVision</p>
-            <p><strong>Motivation Style:</strong> @hero.MotivationStyle</p>
-            <p><strong>Commitment Level:</strong> @hero.CommitmentLevel</p>
-            <p><strong>Daily Reset Time:</strong> @hero.DailyResetTime</p>
+            <div>
+                <p><strong>Email:</strong> @user?.Email</p>
+                <p><strong>Hero Name:</strong> @hero.HeroName</p>
+                <p><strong>Level:</strong> @hero.Level</p>
+                <p><strong>Current XP:</strong> @hero.CurrentXP</p>
+                <p><strong>Total XP:</strong> @hero.TotalXP</p>
+                <p><strong>Life Focus Areas:</strong> @hero.LifeFocusAreas</p>
+                <p><strong>Primary Goals:</strong> @hero.PrimaryGoals</p>
+                <p><strong>Long-Term Vision:</strong> @hero.LongTermVision</p>
+                <p><strong>Motivation Style:</strong> @hero.MotivationStyle</p>
+                <p><strong>Commitment Level:</strong> @hero.CommitmentLevel</p>
+                <p><strong>Daily Reset Time:</strong> @hero.DailyResetTime</p>
+            </div>
         </div>
     </div>
 }
@@ -49,12 +48,5 @@ else
     {
         hero = await Db.HeroProfiles.FirstOrDefaultAsync(h => h.UserId == currentUserId);
         user = await Db.Users.FirstOrDefaultAsync(u => u.Id == currentUserId);
-    }
-
-    private string GetAvatarUrl()
-    {
-        return string.IsNullOrWhiteSpace(hero?.AvatarUrl)
-            ? "images/default-avatar.png"
-            : hero.AvatarUrl;
     }
 }
