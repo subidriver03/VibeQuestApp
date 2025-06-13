@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using VibeQuestApp.Data;
 using VibeQuestApp.Models;
 using VibeQuestApp.Services;
@@ -21,11 +22,13 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
 });
 
+builder.Services.AddScoped<OnboardingStateService>();
+
 // Add EF Core
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Identity (using basic User model)
+// Identity (basic User model)
 builder.Services.AddDefaultIdentity<User>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -37,6 +40,16 @@ builder.Services.AddScoped<QuestService>();
 builder.Services.AddScoped<UserSessionService>();
 
 var app = builder.Build();
+
+// 🔧 Ensure /uploads is accessible as a static folder
+app.UseStaticFiles(); // Required for wwwroot
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.WebRootPath, "uploads")),
+    RequestPath = "/uploads"
+});
 
 // Seed database
 using (var scope = app.Services.CreateScope())
@@ -62,7 +75,7 @@ using (var scope = app.Services.CreateScope())
             {
                 UserId = testUser.Id,
                 HeroName = "Test1",
-                AvatarUrl = "/uploads/test.jpeg",
+                AvatarUrl = "/uploads/test.jpeg", // ✅ Must match a real file in wwwroot/uploads
                 LifeFocusAreas = "Health, Creativity, Personal Development",
                 PrimaryGoals = "test1",
                 LongTermVision = "test2",
@@ -100,11 +113,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Middleware
+// Middleware pipeline
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -3,10 +3,16 @@
 @using VibeQuestApp.Models
 @using Microsoft.EntityFrameworkCore
 @inject AppDbContext Db
+@inject UserSessionService Session
+@inject NavigationManager NavigationManager
 
 <h3>Hero Profile</h3>
 
-@if (heroProfile == null)
+@if (Session.CurrentUser is null)
+{
+    <p class="text-danger">No user session found. Please <a href="/login">log in</a>.</p>
+}
+else if (heroProfile == null)
 {
     <p>Loading profile...</p>
 }
@@ -22,9 +28,24 @@ else
                  onerror="this.src='/images/default-avatar.png'" />
         }
 
+
         <h4>@heroProfile.HeroName</h4>
         <p><strong>Level:</strong> @heroProfile.Level</p>
         <p><strong>Total XP:</strong> @heroProfile.TotalXP</p>
+
+        <div class="mb-3">
+            <label><strong>XP Progress:</strong></label>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar"
+                     style="width:@XpPercentage"
+                     aria-valuenow="@heroProfile.CurrentXP"
+                     aria-valuemin="0"
+                     aria-valuemax="@XpForNextLevel">
+                    @heroProfile.CurrentXP / @XpForNextLevel XP
+                </div>
+            </div>
+        </div>
+
         <p><strong>Focus Areas:</strong> @heroProfile.LifeFocusAreas</p>
         <p><strong>Primary Goals:</strong> @heroProfile.PrimaryGoals</p>
         <p><strong>Long-Term Vision:</strong> @heroProfile.LongTermVision</p>
@@ -36,11 +57,21 @@ else
 
 @code {
     private HeroProfile? heroProfile;
-    private string currentUserId = "1"; // TEMP for testing until real authentication
+
+    private int XpForNextLevel => (int)Math.Pow((heroProfile?.Level ?? 1), 2) * 100;
+    private string XpPercentage =>
+        heroProfile is null ? "0%" :
+        $"{Math.Clamp((double)heroProfile.CurrentXP / XpForNextLevel * 100, 0, 100):F0}%";
 
     protected override async Task OnInitializedAsync()
     {
-        heroProfile = await Db.HeroProfiles
-            .FirstOrDefaultAsync(p => p.UserId == currentUserId);
+        var userId = Session.CurrentUser?.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        heroProfile = await Db.HeroProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
     }
 }
