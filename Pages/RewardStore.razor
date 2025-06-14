@@ -1,32 +1,45 @@
 ﻿@page "/reward-store"
 @using VibeQuestApp.Models
+@using VibeQuestApp.Services
+@inject RewardStoreService RewardService
+@inject UserSessionService UserSession
+@inject NavigationManager Navigation
 
 <PageTitle>Reward Store</PageTitle>
 
 <h2 class="mt-3">🎁 Reward Store</h2>
-<p>Spend your XP on rewards that motivate you to keep going!</p>
+<p>Spend your Hero Coins on rewards that motivate you to keep going!</p>
 
-@if (AvailableRewards.Count == 0)
+@if (heroProfile == null)
 {
-    <p>No rewards available yet. Check back soon!</p>
+    <p>Loading your profile...</p>
 }
 else
 {
-    <div class="row">
-        @foreach (var reward in AvailableRewards)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">@reward.Title</h5>
-                        <p class="card-text">@reward.Description</p>
-                        <p><strong>Cost:</strong> @reward.XpCost XP</p>
-                        <button class="btn btn-primary" @onclick="() => RedeemReward(reward)">Redeem</button>
+    <p><strong>Your Hero Coins:</strong> 🪙 @heroProfile.HeroCoins</p>
+
+    @if (AvailableRewards.Count == 0)
+    {
+        <p>No rewards available yet. Check back soon!</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var reward in AvailableRewards)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@reward.Emoji @reward.Title</h5>
+                            <p class="card-text">@reward.Description</p>
+                            <p><strong>Cost:</strong> @reward.CoinCost 🪙</p>
+                            <button class="btn btn-primary" @onclick="() => RedeemReward(reward)">Redeem</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
 }
 
 @if (!string.IsNullOrEmpty(successMessage))
@@ -35,26 +48,47 @@ else
 }
 
 @code {
-    private List<RewardItem> AvailableRewards = new()
-    {
-        new RewardItem { Title = "Netflix Night", Description = "Watch a guilt-free episode of your favorite show.", XpCost = 200 },
-        new RewardItem { Title = "Coffee Treat", Description = "Enjoy a fancy coffee or tea from your favorite spot.", XpCost = 150 },
-        new RewardItem { Title = "Game Break", Description = "Take 30 minutes to play your favorite video game.", XpCost = 300 }
-    };
-
-    private int CurrentXp = 500; // TEMP: Replace with actual XP from user profile later
+    private HeroProfile? heroProfile;
     private string? successMessage;
 
-    private void RedeemReward(RewardItem reward)
+    private List<RewardItem> AvailableRewards = new()
     {
-        if (CurrentXp >= reward.XpCost)
+        new RewardItem { Title = "Netflix Night", Description = "Watch a guilt-free episode of your favorite show.", CoinCost = 2, Emoji = "📺" },
+        new RewardItem { Title = "Coffee Treat", Description = "Enjoy a fancy coffee or tea from your favorite spot.", CoinCost = 1, Emoji = "☕" },
+        new RewardItem { Title = "Game Break", Description = "Take 30 minutes to play your favorite video game.", CoinCost = 3, Emoji = "🎮" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = UserSession.CurrentUser?.Id;
+
+        if (string.IsNullOrEmpty(userId))
         {
-            CurrentXp -= reward.XpCost;
+            successMessage = "Unable to identify user.";
+            return;
+        }
+
+        heroProfile = await RewardService.GetHeroProfileAsync(userId); // <-- implement this in RewardStoreService
+    }
+
+    private async Task RedeemReward(RewardItem reward)
+    {
+        if (heroProfile is null)
+        {
+            successMessage = "Error loading user profile.";
+            return;
+        }
+
+        if (heroProfile.HeroCoins >= reward.CoinCost)
+        {
+            heroProfile.HeroCoins -= reward.CoinCost;
+            await RewardService.UpdateHeroCoinsAsync(heroProfile); // <-- implement this in RewardStoreService
+
             successMessage = $"You redeemed: {reward.Title}!";
         }
         else
         {
-            successMessage = $"Not enough XP to redeem: {reward.Title}.";
+            successMessage = $"Not enough Hero Coins to redeem: {reward.Title}.";
         }
     }
 
@@ -62,6 +96,7 @@ else
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public int XpCost { get; set; }
+        public int CoinCost { get; set; }
+        public string Emoji { get; set; } = "🎁";
     }
 }

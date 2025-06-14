@@ -9,6 +9,8 @@ namespace VibeQuestApp.Data
         public DbSet<HeroProfile> HeroProfiles => Set<HeroProfile>();
         public DbSet<Quest> Quests => Set<Quest>();
         public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
+        public DbSet<RewardItem> Rewards { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

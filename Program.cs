@@ -10,6 +10,7 @@ using VibeQuestApp.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register services
+builder.Services.AddScoped<LevelService>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddHubOptions(options =>
@@ -22,13 +23,11 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
 });
 
-builder.Services.AddScoped<OnboardingStateService>();
-
-// Add EF Core
+// Entity Framework Core with SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Identity (basic User model)
+// Identity
 builder.Services.AddDefaultIdentity<User>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -38,11 +37,13 @@ builder.Services.AddDefaultIdentity<User>(options =>
 // Custom services
 builder.Services.AddScoped<QuestService>();
 builder.Services.AddScoped<UserSessionService>();
+builder.Services.AddScoped<OnboardingStateService>();
+builder.Services.AddScoped<RewardStoreService>();
 
 var app = builder.Build();
 
-// 🔧 Ensure /uploads is accessible as a static folder
-app.UseStaticFiles(); // Required for wwwroot
+// Serve static files including from /uploads
+app.UseStaticFiles();
 
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -51,7 +52,7 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 
-// Seed database
+// Seed test data if needed
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -75,7 +76,7 @@ using (var scope = app.Services.CreateScope())
             {
                 UserId = testUser.Id,
                 HeroName = "Test1",
-                AvatarUrl = "/uploads/test.jpeg", // ✅ Must match a real file in wwwroot/uploads
+                AvatarUrl = "/uploads/test.jpeg",
                 LifeFocusAreas = "Health, Creativity, Personal Development",
                 PrimaryGoals = "test1",
                 LongTermVision = "test2",
@@ -113,7 +114,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Middleware pipeline
+// Configure middleware
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();

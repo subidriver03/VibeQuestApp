@@ -17,101 +17,101 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = VibeQuestApp
 build_property.RootNamespace = VibeQuestApp
-build_property.ProjectDir = C:\Users\subid\Source\Repos\VibeQuestApp\
+build_property.ProjectDir = C:\Users\subid\source\repos\VibeQuestApp\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\subid\Source\Repos\VibeQuestApp
+build_property.MSBuildProjectDirectory = C:\Users\subid\source\repos\VibeQuestApp
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/App.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/HeroCustomize.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/HeroCustomize.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSGVyb0N1c3RvbWl6ZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Index.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Index.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Journal.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Journal.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm91cm5hbC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Login.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Onboarding/Onboarding.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Onboarding/Onboarding.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT25ib2FyZGluZ1xPbmJvYXJkaW5nLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Onboarding/Step1HeroCreation.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Onboarding/Step1HeroCreation.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT25ib2FyZGluZ1xTdGVwMUhlcm9DcmVhdGlvbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Onboarding/Step2VisionSetup.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Onboarding/Step2VisionSetup.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT25ib2FyZGluZ1xTdGVwMlZpc2lvblNldHVwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Onboarding/Step3AccountSetup.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Onboarding/Step3AccountSetup.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT25ib2FyZGluZ1xTdGVwM0FjY291bnRTZXR1cC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Onboarding/Step4Success.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Onboarding/Step4Success.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT25ib2FyZGluZ1xTdGVwNFN1Y2Nlc3MucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Profile.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Profile.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Quests.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Quests.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUXVlc3RzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Register.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Register.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/RewardStore.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/RewardStore.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmV3YXJkU3RvcmUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/XpDashboard.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/XpDashboard.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcWHBEYXNoYm9hcmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Shared/SurveyPrompt.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Shared/SurveyPrompt.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/_Imports.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Shared/MainLayout.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Shared/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-5mavf80rnw
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Shared/NavMenu.razor]
+[C:/Users/subid/source/repos/VibeQuestApp/Shared/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-9cy5t6hk4b
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/Error.cshtml]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/_Host.cshtml]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/_Host.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/subid/Source/Repos/VibeQuestApp/Pages/_Layout.cshtml]
+[C:/Users/subid/source/repos/VibeQuestApp/Pages/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

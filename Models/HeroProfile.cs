@@ -6,7 +6,7 @@ namespace VibeQuestApp.Models
     public class HeroProfile
     {
         [Key]
-        public int Id { get; set; }  // ✅ Primary Key for EF Core
+        public int Id { get; set; }
 
         public string HeroName { get; set; } = string.Empty;
         public string AvatarUrl { get; set; } = string.Empty;
@@ -16,6 +16,7 @@ namespace VibeQuestApp.Models
         public string MotivationStyle { get; set; } = string.Empty;
         public string CommitmentLevel { get; set; } = string.Empty;
         public TimeSpan DailyResetTime { get; set; } = TimeSpan.FromHours(4);
+        public int HeroCoins { get; set; } = 0;
 
         public int Level { get; set; } = 1;
         public int CurrentXP { get; set; } = 0;
@@ -26,5 +27,19 @@ namespace VibeQuestApp.Models
 
         public int JournalStreak { get; set; } = 0;
         public DateTime? LastJournalEntryDate { get; set; }
+
+        public int CalculateLevel()
+        {
+            int level = 1;
+            int requiredXP = 0;
+
+            while (TotalXP >= requiredXP)
+            {
+                level++;
+                requiredXP = 50 * level * (level - 1);
+            }
+
+            return level - 1;
+        }
     }
 }
