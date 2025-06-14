@@ -34,6 +34,11 @@
     {
         <div class="alert alert-danger">@ErrorMessage</div>
     }
+
+    @if (formSubmittedSuccessfully)
+    {
+        <div class="alert alert-success">🎉 Account created successfully!</div>
+    }
 </EditForm>
 
 @code {
@@ -49,8 +54,13 @@
     public string ConfirmPassword { get; set; } = "";
 
     public string? ErrorMessage { get; set; }
-
     private bool formSubmittedSuccessfully = false;
+
+    private async Task HandleFormSubmit()
+    {
+        var success = await SubmitFormAsync();
+        formSubmittedSuccessfully = success;
+    }
 
     public async Task<bool> SubmitFormAsync()
     {
@@ -60,9 +70,7 @@
         bool isValid = Validator.TryValidateObject(this, validationContext, validationResults, true);
 
         if (!isValid)
-        {
             return false;
-        }
 
         return await HandleFinalStep();
     }
@@ -118,7 +126,7 @@
 
     private Task HandleValidSubmit()
     {
-        // Only needed to satisfy OnValidSubmit but not used, form is handled via SubmitFormAsync
+        // No-op, form submission is manually triggered with HandleFormSubmit
         return Task.CompletedTask;
     }
 }
