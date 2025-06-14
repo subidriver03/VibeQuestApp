@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\subid\\Source\\Repos\\VibeQuestApp\\VibeQuestApp.csproj": {}
+    "C:\\Users\\subid\\source\\repos\\VibeQuestApp\\VibeQuestApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\subid\\Source\\Repos\\VibeQuestApp\\VibeQuestApp.csproj": {
+    "C:\\Users\\subid\\source\\repos\\VibeQuestApp\\VibeQuestApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\subid\\Source\\Repos\\VibeQuestApp\\VibeQuestApp.csproj",
+        "projectUniqueName": "C:\\Users\\subid\\source\\repos\\VibeQuestApp\\VibeQuestApp.csproj",
         "projectName": "VibeQuestApp",
-        "projectPath": "C:\\Users\\subid\\Source\\Repos\\VibeQuestApp\\VibeQuestApp.csproj",
+        "projectPath": "C:\\Users\\subid\\source\\repos\\VibeQuestApp\\VibeQuestApp.csproj",
         "packagesPath": "C:\\Users\\subid\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\subid\\Source\\Repos\\VibeQuestApp\\obj\\",
+        "outputPath": "C:\\Users\\subid\\source\\repos\\VibeQuestApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -63,13 +63,19 @@
               "target": "Package",
               "version": "[9.0.6, )"
             },
-            "Microsoft.Data.SqlClient": {
+            "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[6.0.2, )"
+              "version": "[9.0.6, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.6, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[9.0.5, )"
+              "version": "[9.0.6, )"
             },
             "Microsoft.EntityFrameworkCore.Sqlite": {
               "target": "Package",
@@ -101,7 +107,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

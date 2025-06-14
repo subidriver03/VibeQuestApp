@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VibeQuestApp.Data;
 
@@ -10,9 +11,11 @@ using VibeQuestApp.Data;
 namespace VibeQuestApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250613230844_RecreateRewardSystem")]
+    partial class RecreateRewardSystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.6");
@@ -36,9 +39,6 @@ namespace VibeQuestApp.Migrations
 
                     b.Property<TimeSpan>("DailyResetTime")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("HeroCoins")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("HeroName")
                         .IsRequired()
@@ -155,32 +155,6 @@ namespace VibeQuestApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Quests");
-                });
-
-            modelBuilder.Entity("VibeQuestApp.Models.RewardItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("XPPrice")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Rewards");
                 });
 
             modelBuilder.Entity("VibeQuestApp.Models.User", b =>
