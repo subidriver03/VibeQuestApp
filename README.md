@@ -404,3 +404,16 @@ A linear 3-step process (`Step1HeroCreation`, `Step2VisionSetup`, `Step3AccountS
 
 ---
 
+## 🧠 XP & Leveling System
+
+The app now includes a fully functioning XP-based leveling system:
+
+- 📈 **Level Formula:** `50 * Level * (Level - 1)`
+- 🧮 **Centralized Logic:** Managed via `LevelService.cs`, injected throughout the app
+- 🎯 **Dynamic Updates:** Hero levels up automatically based on total XP
+- 🔁 **XP Sync:** HeroProfile auto-recalculates level using `CalculateLevel()` method
+- 💾 **Seed Data:** Default user is preloaded with XP, quests, and HeroCoins for testing
+
+To use in your services or UI:
+```csharp
+int currentLevel = levelService.GetLevel(hero.TotalXP);
