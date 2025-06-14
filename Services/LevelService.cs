@@ -15,5 +15,14 @@
 
             return level - 1;
         }
+
+        public int GetXPToNextLevel(int totalXP)
+        {
+            int level = GetLevel(totalXP);
+            int nextLevel = level + 1;
+            int xpForNextLevel = 50 * nextLevel * (nextLevel - 1);
+            return xpForNextLevel - totalXP;
+        }
+
     }
 }
