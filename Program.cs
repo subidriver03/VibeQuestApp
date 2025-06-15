@@ -9,48 +9,42 @@ using VibeQuestApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Configure services
+// Register services
+builder.Services.AddScoped<LevelService>();
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor().AddHubOptions(options =>
-{
-    options.MaximumReceiveMessageSize = 10 * 1024 * 1024;
-});
+builder.Services.AddServerSideBlazor()
+    .AddHubOptions(options =>
+    {
+        options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10MB
+    });
 
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 10 * 1024 * 1024;
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
 });
 
+// Entity Framework Core with SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ✅ Configure ASP.NET Identity
-builder.Services.AddIdentity<User, IdentityRole>(options =>
+// Identity
+builder.Services.AddDefaultIdentity<User>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
-.AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
+.AddEntityFrameworkStores<AppDbContext>();
 
-// ✅ App-specific services
-builder.Services.AddScoped<LevelService>();
+// Custom services
 builder.Services.AddScoped<QuestService>();
 builder.Services.AddScoped<UserSessionService>();
 builder.Services.AddScoped<OnboardingStateService>();
 builder.Services.AddScoped<RewardStoreService>();
-builder.Services.AddScoped<DevToolService>();
 
 var app = builder.Build();
 
-// ✅ Migrate database before first use
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
-}
-
-// ✅ Middleware
+// Serve static files including from /uploads
 app.UseStaticFiles();
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
@@ -58,6 +52,69 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 
+// Seed test data if needed
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+    if (!db.Users.Any())
+    {
+        var testUser = new User
+        {
+            UserName = "test@example.com",
+            Email = "test@example.com"
+        };
+
+        var result = await userManager.CreateAsync(testUser, "1234");
+
+        if (result.Succeeded)
+        {
+            db.HeroProfiles.Add(new HeroProfile
+            {
+                UserId = testUser.Id,
+                HeroName = "Test1",
+                AvatarUrl = "/uploads/test.jpeg",
+                LifeFocusAreas = "Health, Creativity, Personal Development",
+                PrimaryGoals = "test1",
+                LongTermVision = "test2",
+                MotivationStyle = "Rewards",
+                CommitmentLevel = "Casual",
+                DailyResetTime = TimeSpan.FromHours(4),
+                Level = 1,
+                CurrentXP = 0,
+                TotalXP = 0
+            });
+
+            db.Quests.AddRange(
+                new Quest
+                {
+                    UserId = testUser.Id,
+                    Title = "Complete your first quest",
+                    Description = "Mark this task as done to earn XP!",
+                    XpReward = 50,
+                    DueDate = DateTime.Today.AddDays(1),
+                    IsCompleted = false
+                },
+                new Quest
+                {
+                    UserId = testUser.Id,
+                    Title = "Check your profile",
+                    Description = "Make sure your hero info is filled out.",
+                    XpReward = 30,
+                    DueDate = DateTime.Today.AddDays(2),
+                    IsCompleted = false
+                }
+            );
+
+            db.SaveChanges();
+        }
+    }
+}
+
+// Configure middleware
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
@@ -66,4 +123,4 @@ app.UseAuthorization();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-await app.RunAsync();
+app.Run();

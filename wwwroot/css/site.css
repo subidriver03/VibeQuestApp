@@ -62,24 +62,3 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
-
-.nav-link {
-    margin-bottom: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    transition: background-color 0.2s;
-}
-
-    .nav-link.active {
-        background-color: #343a40;
-        font-weight: bold;
-    }
-
-    .nav-link:hover {
-        background-color: #495057;
-        text-decoration: none;
-    }
-
-.progress-bar {
-    transition: width 0.6s ease-in-out;
-}

@@ -28,20 +28,20 @@ else
                  onerror="this.src='/images/default-avatar.png'" />
         }
 
+
         <h4>@heroProfile.HeroName</h4>
         <p><strong>Level:</strong> @heroProfile.Level</p>
         <p><strong>Total XP:</strong> @heroProfile.TotalXP</p>
-        <p><strong>XP to Next Level:</strong> @heroProfile.XPRequiredForNextLevel</p>
 
         <div class="mb-3">
             <label><strong>XP Progress:</strong></label>
             <div class="progress">
-                <div class="progress-bar bg-info" role="progressbar"
-                     style="width:@($"{heroProfile.XPProgressPercentage:F0}%")"
-                     aria-valuenow="@heroProfile.XPIntoCurrentLevel"
+                <div class="progress-bar" role="progressbar"
+                     style="width:@XpPercentage"
+                     aria-valuenow="@heroProfile.CurrentXP"
                      aria-valuemin="0"
-                     aria-valuemax="@heroProfile.XPRequiredForNextLevel">
-                    @heroProfile.XPIntoCurrentLevel / @heroProfile.XPRequiredForNextLevel XP
+                     aria-valuemax="@XpForNextLevel">
+                    @heroProfile.CurrentXP / @XpForNextLevel XP
                 </div>
             </div>
         </div>
@@ -57,6 +57,11 @@ else
 
 @code {
     private HeroProfile? heroProfile;
+
+    private int XpForNextLevel => (int)Math.Pow((heroProfile?.Level ?? 1), 2) * 100;
+    private string XpPercentage =>
+        heroProfile is null ? "0%" :
+        $"{Math.Clamp((double)heroProfile.CurrentXP / XpForNextLevel * 100, 0, 100):F0}%";
 
     protected override async Task OnInitializedAsync()
     {

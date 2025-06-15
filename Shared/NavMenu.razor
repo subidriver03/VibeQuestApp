@@ -1,50 +1,61 @@
-﻿@inject UserSessionService Session
+﻿@using VibeQuestApp.Services
 @inject NavigationManager NavigationManager
-
+@inject UserSessionService Session
 @implements IDisposable
 
 <div class="sidebar">
-    <nav class="nav flex-column">
-        @if (Session.CurrentUser is null)
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <NavLink class="nav-link" href="/">Home</NavLink>
+        </li>
+
+        @if (!Session.IsLoggedIn)
         {
-            <!-- Guest Menu -->
-            <a class="nav-link" href="/">Get Started</a>
-            <a class="nav-link" href="/login">Log In</a>
-        }
-        else if (Session.CurrentUser.IsDeveloper)
-        {
-            <!-- Developer Menu -->
-            <a class="nav-link" href="/developer/dashboard">Dev Dashboard</a>
-            <a class="nav-link text-danger" href="#" @onclick="Logout">Logout</a>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/hero-customize">Start Your Quest</NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/login">Login</NavLink>
+            </li>
         }
         else
         {
-            <!-- Authenticated User Menu -->
-            <a class="nav-link" href="/quests">Quests</a>
-            <a class="nav-link" href="/journal">Journal</a>
-            <a class="nav-link" href="/profile">Profile</a>
-            <a class="nav-link" href="/rewards">Rewards</a>
-            <a class="nav-link text-danger" href="#" @onclick="Logout">Logout</a>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/profile">Profile</NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/quests">Quests</NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/xp-dashboard">XP Dashboard</NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/journal">Journal</NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/reward-store">Reward Store</NavLink>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="#" @onclick="Logout">Logout</a>
+            </li>
         }
-    </nav>
+    </ul>
 </div>
 
 @code {
+    private void Logout()
+    {
+        Session.SetUser(null!); // use null-forgiving operator to suppress warning
+        NavigationManager.NavigateTo("/");
+    }
+
     protected override void OnInitialized()
     {
-        // Subscribe to session changes to refresh UI
         Session.OnChange += StateHasChanged;
     }
 
     public void Dispose()
     {
-        // Prevent memory leaks by unsubscribing
         Session.OnChange -= StateHasChanged;
-    }
-
-    private void Logout()
-    {
-        Session.ClearUser(); // Calls your service to clear session
-        NavigationManager.NavigateTo("/", true);
     }
 }
