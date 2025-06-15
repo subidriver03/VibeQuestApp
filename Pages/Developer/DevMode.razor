@@ -1,0 +1,71 @@
+﻿@page "/developer/dev-mode"
+@using VibeQuestApp.Services
+@using VibeQuestApp.Models
+@inject DevToolService DevTools
+@inject UserSessionService Session
+@inject NavigationManager Navigation
+
+<h2>🛠️ Developer Mode</h2>
+
+@if (Session.CurrentUser is null)
+{
+    <div class="alert alert-danger">
+        No user session found. Please log in to use Developer Mode.
+    </div>
+}
+else
+{
+    <div class="card border-info shadow-sm p-4 mt-4">
+        <h4 class="text-info">🔧 Developer Tools</h4>
+        <p class="text-muted">These tools allow you to modify or wipe data during testing.</p>
+
+        <div class="mb-3 mt-4">
+            <button class="btn btn-outline-warning me-2" @onclick="ResetXP">Reset XP</button>
+            <button class="btn btn-outline-danger me-2" @onclick="WipeQuests">Wipe Quests</button>
+            <button class="btn btn-outline-dark" @onclick="WipeAllUserData">Wipe Entire Account</button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-info mt-2">@message</div>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert alert-info mt-2">@message</div>
+    }
+}
+
+@code {
+    private string? message;
+
+    private async Task ResetXP()
+    {
+        if (Session.CurrentUser is not null)
+        {
+            await DevTools.ResetXPAsync(Session.CurrentUser.Id);
+            message = "User XP reset successfully.";
+        }
+    }
+
+    private async Task WipeQuests()
+    {
+        if (Session.CurrentUser is not null)
+        {
+            await DevTools.WipeUserQuestsAsync(Session.CurrentUser.Id);
+            message = "All quests removed for user.";
+        }
+    }
+
+    private async Task WipeAllUserData()
+    {
+        if (Session.CurrentUser is not null)
+        {
+            var userId = Session.CurrentUser.Id;
+            await DevTools.WipeUserDataAsync(userId);
+            Session.ClearUser();
+            Navigation.NavigateTo("/");
+        }
+    }
+}

@@ -1,78 +1,65 @@
 ﻿@page "/login"
-@using System.ComponentModel.DataAnnotations
-@using Microsoft.EntityFrameworkCore
-@using VibeQuestApp.Data
+@using Microsoft.AspNetCore.Identity
 @using VibeQuestApp.Models
-@inject AppDbContext Db
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
+@inject UserSessionService Session
 @inject NavigationManager NavigationManager
-@inject VibeQuestApp.Services.UserSessionService Session
-@inject ILogger<Login> Logger
-
-<h3>Login</h3>
-
-@if (loginFailed)
-{
-    <div class="alert alert-danger">Invalid email or password. Please try again.</div>
-}
 
 <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="mb-3">
+    <div>
         <label>Email:</label>
-        <InputText class="form-control" @bind-Value="loginModel.Email" />
+        <InputText @bind-Value="loginModel.Email" placeholder="Email" />
     </div>
-
-    <div class="mb-3">
+    <div>
         <label>Password:</label>
-        <InputText type="password" class="form-control" @bind-Value="loginModel.Password" />
+        <InputText @bind-Value="loginModel.Password" placeholder="Password" type="password" />
     </div>
 
-    <button class="btn btn-primary" type="submit">Login</button>
+    <button type="submit">Login</button>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p style="color:red;">@errorMessage</p>
+    }
 </EditForm>
 
 @code {
     private LoginModel loginModel = new();
-    private bool loginFailed = false;
+    private string? errorMessage;
 
     private async Task HandleLogin()
     {
-        Logger.LogDebug("Attempting login for email: {Email}", loginModel.Email);
-
-        var user = await Db.Users.FirstOrDefaultAsync(u => u.Email == loginModel.Email);
-
-        if (user != null)
+        var user = await UserManager.FindByEmailAsync(loginModel.Email);
+        if (user is null)
         {
-            Logger.LogDebug("User found. Verifying password...");
+            errorMessage = "Invalid email or password.";
+            return;
+        }
 
-            bool passwordMatches = BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash);
-            if (passwordMatches)
-            {
-                Logger.LogInformation("Login successful for user: {Email}", user.Email);
-                Session.SetUser(user);
-                NavigationManager.NavigateTo("/profile");
-                return;
-            }
+        var result = await SignInManager.CheckPasswordSignInAsync(user, loginModel.Password, false);
+
+        if (result.Succeeded)
+        {
+            Session.SetUser(user);
+
+            if (user.IsDeveloper)
+                NavigationManager.NavigateTo("/developer/dashboard");
             else
-            {
-                Logger.LogWarning("Password mismatch for email: {Email}", loginModel.Email);
-            }
+                NavigationManager.NavigateTo("/profile");
         }
         else
         {
-            Logger.LogWarning("No user found with email: {Email}", loginModel.Email);
+            errorMessage = "Invalid email or password.";
         }
-
-        loginFailed = true;
     }
 
     private class LoginModel
     {
-        [Required]
         public string Email { get; set; } = string.Empty;
-
-        [Required]
         public string Password { get; set; } = string.Empty;
     }
 }

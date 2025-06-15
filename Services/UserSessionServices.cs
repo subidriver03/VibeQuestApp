@@ -12,21 +12,22 @@ namespace VibeQuestApp.Services
 
         public bool IsLoggedIn => _currentUser != null;
 
+        public bool IsDeveloper => _currentUser?.IsDeveloper == true;
+
         public void SetUser(User user)
         {
             _currentUser = user;
-            OnChange?.Invoke();
+            NotifyStateChanged();
         }
 
         public void ClearUser()
         {
             _currentUser = null;
-            OnChange?.Invoke();
+            NotifyStateChanged();
         }
 
-        public virtual User? GetUser()
-        {
-            return _currentUser;
-        }
+        public User? GetUser() => _currentUser;
+
+        private void NotifyStateChanged() => OnChange?.Invoke();
     }
 }

@@ -1,0 +1,125 @@
+﻿@page "/dev-seed"
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using VibeQuestApp.Models
+@using VibeQuestApp.Data
+@using Microsoft.Data.Sqlite
+
+@inject UserManager<User> UserManager
+@inject AppDbContext Db
+
+<h3>Developer Seeder</h3>
+
+@if (_message is not null)
+{
+    <p>@((MarkupString)_message)</p>
+}
+else
+{
+    <button @onclick="RunSeed">Seed Test + Dev Users</button>
+}
+
+@code {
+    private string? _message;
+
+    private async Task RunSeed()
+    {
+        var seeded = new List<string>();
+
+        try
+        {
+            var canConnect = await Db.Database.CanConnectAsync();
+            if (!canConnect)
+            {
+                _message = "❌ Cannot connect to the database.";
+                return;
+            }
+
+            // Test if AspNetUsers table exists
+            var userTest = await Db.Users.AnyAsync();
+
+            // Seed Test User
+            var testEmail = "test@example.com";
+            if (await UserManager.FindByEmailAsync(testEmail) is null)
+            {
+                var testUser = new User
+                {
+                    UserName = testEmail,
+                    Email = testEmail,
+                    DisplayName = "Test User",
+                    AvatarUrl = "/uploads/test.jpg"
+                };
+
+                var result = await UserManager.CreateAsync(testUser, "Test@123");
+                if (result.Succeeded)
+                {
+                    Db.HeroProfiles.Add(new HeroProfile
+                    {
+                        UserId = testUser.Id,
+                        HeroName = "Test Hero",
+                        AvatarUrl = "/uploads/test.jpg",
+                        LifeFocusAreas = "Creativity, Productivity",
+                        PrimaryGoals = "Complete onboarding",
+                        LongTermVision = "Master personal growth",
+                        MotivationStyle = "Achievement",
+                        CommitmentLevel = "Focused",
+                        DailyResetTime = TimeSpan.FromHours(4),
+                        Level = 1,
+                        CurrentXP = 0,
+                        TotalXP = 0,
+                        HeroCoins = 5
+                    });
+
+                    seeded.Add("✅ Test User");
+                }
+            }
+
+            // Seed Dev User
+            var devEmail = "dev@example.com";
+            if (await UserManager.FindByEmailAsync(devEmail) is null)
+            {
+                var devUser = new User
+                {
+                    UserName = devEmail,
+                    Email = devEmail,
+                    DisplayName = "Developer",
+                    AvatarUrl = "/uploads/dev.jpg"
+                };
+
+                var result = await UserManager.CreateAsync(devUser, "Dev@12345");
+                if (result.Succeeded)
+                {
+                    Db.HeroProfiles.Add(new HeroProfile
+                    {
+                        UserId = devUser.Id,
+                        HeroName = "Dev Master",
+                        AvatarUrl = "/uploads/dev.jpg",
+                        LifeFocusAreas = "Building",
+                        PrimaryGoals = "Ship MVP",
+                        LongTermVision = "Innovation",
+                        MotivationStyle = "Grit",
+                        CommitmentLevel = "High",
+                        DailyResetTime = TimeSpan.FromHours(3),
+                        Level = 3,
+                        CurrentXP = 250,
+                        TotalXP = 250,
+                        HeroCoins = 20
+                    });
+
+                    seeded.Add("✅ Dev User");
+                }
+            }
+
+            await Db.SaveChangesAsync();
+            _message = seeded.Count > 0 ? string.Join("<br>", seeded) : "ℹ️ Users already exist.";
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 1 && ex.Message.Contains("no such table"))
+        {
+            _message = "❌ Identity tables are missing. Please restart the app or trigger migration.";
+        }
+        catch (Exception ex)
+        {
+            _message = $"❌ Unexpected error: {ex.Message}";
+        }
+    }
+}
