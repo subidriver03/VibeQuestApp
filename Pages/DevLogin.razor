@@ -1,11 +1,9 @@
 @page "/dev-login"
 @using System.ComponentModel.DataAnnotations
-@using Microsoft.EntityFrameworkCore
-@using VibeQuestApp.Data
 @using VibeQuestApp.Models
-@inject AppDbContext Db
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
-@inject VibeQuestApp.Services.UserSessionService Session
 @inject ILogger<DevLogin> Logger
 
 <h3>Developer Login</h3>
@@ -40,13 +38,16 @@
     {
         Logger.LogDebug("Attempting dev login for email: {Email}", loginModel.Email);
 
-        var user = await Db.Users.FirstOrDefaultAsync(u => u.Email == loginModel.Email);
-        if (user != null && user.IsDeveloper && BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash))
+        var user = await UserManager.FindByEmailAsync(loginModel.Email!);
+        if (user != null && user.IsDeveloper)
         {
-            Logger.LogInformation("Developer login successful for user: {Email}", user.Email);
-            Session.SetUser(user);
-            NavigationManager.NavigateTo("/developer/dashboard");
-            return;
+            var result = await SignInManager.PasswordSignInAsync(user.UserName!, loginModel.Password!, false, false);
+            if (result.Succeeded)
+            {
+                Logger.LogInformation("Developer login successful for user: {Email}", user.Email);
+                NavigationManager.NavigateTo("/developer/dashboard");
+                return;
+            }
         }
 
         Logger.LogWarning("Dev login failed for email: {Email}", loginModel.Email);

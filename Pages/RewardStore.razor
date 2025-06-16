@@ -2,7 +2,8 @@
 @using VibeQuestApp.Models
 @using VibeQuestApp.Services
 @inject RewardStoreService RewardService
-@inject UserSessionService UserSession
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 
 <PageTitle>Reward Store</PageTitle>
@@ -60,7 +61,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var userId = UserSession.CurrentUser?.Id;
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = await UserManager.GetUserAsync(authState.User);
+        var userId = user?.Id;
 
         if (string.IsNullOrEmpty(userId))
         {
@@ -68,7 +71,7 @@ else
             return;
         }
 
-        heroProfile = await RewardService.GetHeroProfileAsync(userId); // <-- implement this in RewardStoreService
+        heroProfile = await RewardService.GetHeroProfileAsync(userId);
     }
 
     private async Task RedeemReward(RewardItem reward)

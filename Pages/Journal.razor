@@ -4,7 +4,8 @@
 @using VibeQuestApp.Services
 @using Microsoft.EntityFrameworkCore
 @inject AppDbContext Db
-@inject UserSessionService Session
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthProvider
 
 <PageTitle>Journal</PageTitle>
 
@@ -67,7 +68,8 @@ else
     private List<JournalEntry> entries = new();
     private JournalEntry newEntry = new();
     private HeroProfile? profile;
-    private string? currentUserId => Session.CurrentUser?.Id;
+    private string? currentUserId;
+    private User? user;
 
     private string? prompt;
     private int currentStreak = 0;
@@ -88,6 +90,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        user = await UserManager.GetUserAsync(authState.User);
+        currentUserId = user?.Id;
         if (currentUserId == null)
         {
             return;
