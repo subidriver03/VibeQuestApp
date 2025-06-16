@@ -90,7 +90,7 @@ Users create a “Hero” persona that reflects their growth journey.
 
 | Role         | Access Permissions                          |
 |--------------|---------------------------------------------|
-| Guest        | Get Started, Register, Log In               |
+| Guest        | Get Started, Register, Log In, Dev Login    |
 | User         | Quests, Journal, Rewards, XP Dashboard      |
 | Developer    | Developer Dashboard, Modify Any User        |
 
@@ -215,6 +215,7 @@ Task completion updates
 🔒 Auth Behavior Recap
 Page	Requires Login?	Notes
 /login	❌	Public
+/dev-login	❌	Developer only
 /quests	✅	Authenticated users only
 /developer/dashboard	✅ (Developer)	Devs only via IsDeveloper
 /hero-customize	❌	Public onboarding

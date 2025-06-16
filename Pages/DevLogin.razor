@@ -1,0 +1,55 @@
+@page "/dev-login"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.EntityFrameworkCore
+@using VibeQuestApp.Data
+@using VibeQuestApp.Models
+@inject AppDbContext Db
+@inject NavigationManager NavigationManager
+@inject VibeQuestApp.Services.UserSessionService Session
+@inject ILogger<DevLogin> Logger
+
+<h3>Developer Login</h3>
+
+@if (loginFailed)
+{
+    <div class="alert alert-danger">Invalid credentials or not a developer.</div>
+}
+
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Email:</label>
+        <InputText class="form-control" @bind-Value="loginModel.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label>Password:</label>
+        <InputText type="password" class="form-control" @bind-Value="loginModel.Password" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Login</button>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new();
+    private bool loginFailed = false;
+
+    private async Task HandleLogin()
+    {
+        Logger.LogDebug("Attempting dev login for email: {Email}", loginModel.Email);
+
+        var user = await Db.Users.FirstOrDefaultAsync(u => u.Email == loginModel.Email);
+        if (user != null && user.IsDeveloper && BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash))
+        {
+            Logger.LogInformation("Developer login successful for user: {Email}", user.Email);
+            Session.SetUser(user);
+            NavigationManager.NavigateTo("/developer/dashboard");
+            return;
+        }
+
+        Logger.LogWarning("Dev login failed for email: {Email}", loginModel.Email);
+        loginFailed = true;
+    }
+}

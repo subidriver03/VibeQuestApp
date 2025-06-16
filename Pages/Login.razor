@@ -33,7 +33,7 @@
 </EditForm>
 
 @code {
-    private LoginModel loginModel = new();
+    private VibeQuestApp.Models.LoginModel loginModel = new();
     private bool loginFailed = false;
 
     private async Task HandleLogin()
@@ -51,7 +51,14 @@
             {
                 Logger.LogInformation("Login successful for user: {Email}", user.Email);
                 Session.SetUser(user);
-                NavigationManager.NavigateTo("/profile");
+                if (user.IsDeveloper)
+                {
+                    NavigationManager.NavigateTo("/developer/dashboard");
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/profile");
+                }
                 return;
             }
             else
@@ -67,12 +74,4 @@
         loginFailed = true;
     }
 
-    private class LoginModel
-    {
-        [Required]
-        public string Email { get; set; } = string.Empty;
-
-        [Required]
-        public string Password { get; set; } = string.Empty;
-    }
 }
