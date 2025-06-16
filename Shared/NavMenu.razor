@@ -35,6 +35,12 @@
             <li class="nav-item">
                 <NavLink class="nav-link" href="/reward-store">Reward Store</NavLink>
             </li>
+            @if (Session.CurrentUser?.IsDeveloper == true)
+            {
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/developer/dashboard">Developer</NavLink>
+                </li>
+            }
             <li class="nav-item">
                 <a class="nav-link text-danger" href="#" @onclick="Logout">Logout</a>
             </li>
