@@ -58,21 +58,18 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-
     if (!db.Users.Any())
     {
         var testUser = new User
         {
             UserName = "test@example.com",
-            Email = "test@example.com"
+            Email = "test@example.com",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("1234")
         };
 
-        var result = await userManager.CreateAsync(testUser, "1234");
+        db.Users.Add(testUser);
 
-        if (result.Succeeded)
-        {
-            db.HeroProfiles.Add(new HeroProfile
+        db.HeroProfiles.Add(new HeroProfile
             {
                 UserId = testUser.Id,
                 HeroName = "Test1",
@@ -88,29 +85,54 @@ using (var scope = app.Services.CreateScope())
                 TotalXP = 0
             });
 
-            db.Quests.AddRange(
-                new Quest
-                {
-                    UserId = testUser.Id,
-                    Title = "Complete your first quest",
-                    Description = "Mark this task as done to earn XP!",
-                    XpReward = 50,
-                    DueDate = DateTime.Today.AddDays(1),
-                    IsCompleted = false
-                },
-                new Quest
-                {
-                    UserId = testUser.Id,
-                    Title = "Check your profile",
-                    Description = "Make sure your hero info is filled out.",
-                    XpReward = 30,
-                    DueDate = DateTime.Today.AddDays(2),
-                    IsCompleted = false
-                }
-            );
+        db.Quests.AddRange(
+            new Quest
+            {
+                UserId = testUser.Id,
+                Title = "Complete your first quest",
+                Description = "Mark this task as done to earn XP!",
+                XpReward = 50,
+                DueDate = DateTime.Today.AddDays(1),
+                IsCompleted = false
+            },
+            new Quest
+            {
+                UserId = testUser.Id,
+                Title = "Check your profile",
+                Description = "Make sure your hero info is filled out.",
+                XpReward = 30,
+                DueDate = DateTime.Today.AddDays(2),
+                IsCompleted = false
+            }
+        );
 
-            db.SaveChanges();
-        }
+        var devUser = new User
+        {
+            UserName = "dev@example.com",
+            Email = "dev@example.com",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("dev1234"),
+            IsDeveloper = true
+        };
+
+        db.Users.Add(devUser);
+
+        db.HeroProfiles.Add(new HeroProfile
+        {
+            UserId = devUser.Id,
+            HeroName = "DevHero",
+            AvatarUrl = "/uploads/test.jpeg",
+            LifeFocusAreas = "All",
+            PrimaryGoals = "Manage Users",
+            LongTermVision = "Admin",
+            MotivationStyle = "Rewards",
+            CommitmentLevel = "Casual",
+            DailyResetTime = TimeSpan.FromHours(4),
+            Level = 1,
+            CurrentXP = 0,
+            TotalXP = 0
+        });
+
+        db.SaveChanges();
     }
 }
 

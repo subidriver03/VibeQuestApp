@@ -1,0 +1,115 @@
+@page "/developer/dashboard"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.EntityFrameworkCore
+@using VibeQuestApp.Data
+@using VibeQuestApp.Models
+@inject AppDbContext Db
+@inject UserSessionService Session
+
+<h3>Developer Dashboard</h3>
+
+@if (Session.CurrentUser is null || !Session.CurrentUser.IsDeveloper)
+{
+    <p class="text-danger">Access denied.</p>
+}
+else
+{
+    <h4>Create New User</h4>
+    <EditForm Model="newUser" OnValidSubmit="CreateUser">
+        <DataAnnotationsValidator />
+        <div class="row g-2 mb-3">
+            <div class="col">
+                <InputText class="form-control" placeholder="Email" @bind-Value="newUser.Email" />
+            </div>
+            <div class="col">
+                <InputText class="form-control" type="password" placeholder="Password" @bind-Value="newUser.Password" />
+            </div>
+            <div class="col">
+                <InputText class="form-control" placeholder="Display Name" @bind-Value="newUser.DisplayName" />
+            </div>
+            <div class="col d-flex align-items-center">
+                <label class="form-check-label me-2">Developer?</label>
+                <InputCheckbox class="form-check-input" @bind-Value="newUser.IsDeveloper" />
+            </div>
+            <div class="col">
+                <button class="btn btn-primary" type="submit">Create</button>
+            </div>
+        </div>
+    </EditForm>
+
+    <h4 class="mt-4">All Users</h4>
+    @if (users == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Display Name</th>
+                    <th>Developer</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in users)
+                {
+                    <tr>
+                        <td>@u.Email</td>
+                        <td><InputText class="form-control" @bind-Value="u.DisplayName" /></td>
+                        <td><InputCheckbox @bind-Value="u.IsDeveloper" /></td>
+                        <td><button class="btn btn-sm btn-success" @onclick="() => SaveUser(u)">Save</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private List<User>? users;
+    private NewUser newUser = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Session.CurrentUser?.IsDeveloper == true)
+        {
+            users = await Db.Users.ToListAsync();
+        }
+    }
+
+    private async Task CreateUser()
+    {
+        var user = new User
+        {
+            Email = newUser.Email!,
+            UserName = newUser.Email!,
+            DisplayName = newUser.DisplayName ?? string.Empty,
+            IsDeveloper = newUser.IsDeveloper,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.Password!)
+        };
+
+        Db.Users.Add(user);
+        await Db.SaveChangesAsync();
+        users = await Db.Users.ToListAsync();
+        newUser = new();
+    }
+
+    private async Task SaveUser(User user)
+    {
+        Db.Users.Update(user);
+        await Db.SaveChangesAsync();
+    }
+
+    private class NewUser
+    {
+        [Required, EmailAddress]
+        public string? Email { get; set; }
+        [Required]
+        public string? Password { get; set; }
+        public string? DisplayName { get; set; }
+        public bool IsDeveloper { get; set; }
+    }
+}
