@@ -1,16 +1,16 @@
-﻿@page "/login"
+@page "/dev-login"
 @using System.ComponentModel.DataAnnotations
 @using VibeQuestApp.Models
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
-@inject ILogger<Login> Logger
+@inject ILogger<DevLogin> Logger
 
-<h3>Login</h3>
+<h3>Developer Login</h3>
 
 @if (loginFailed)
 {
-    <div class="alert alert-danger">Invalid email or password. Please try again.</div>
+    <div class="alert alert-danger">Invalid credentials or not a developer.</div>
 }
 
 <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
@@ -31,31 +31,26 @@
 </EditForm>
 
 @code {
-    private VibeQuestApp.Models.LoginModel loginModel = new();
+    private LoginModel loginModel = new();
     private bool loginFailed = false;
 
     private async Task HandleLogin()
     {
-        Logger.LogDebug("Attempting login for email: {Email}", loginModel.Email);
+        Logger.LogDebug("Attempting dev login for email: {Email}", loginModel.Email);
 
-        var result = await SignInManager.PasswordSignInAsync(loginModel.Email!, loginModel.Password!, false, false);
-
-        if (result.Succeeded)
+        var user = await UserManager.FindByEmailAsync(loginModel.Email!);
+        if (user != null && user.IsDeveloper)
         {
-            var user = await UserManager.FindByEmailAsync(loginModel.Email!);
-            if (user != null && user.IsDeveloper)
+            var result = await SignInManager.PasswordSignInAsync(user.UserName!, loginModel.Password!, false, false);
+            if (result.Succeeded)
             {
+                Logger.LogInformation("Developer login successful for user: {Email}", user.Email);
                 NavigationManager.NavigateTo("/developer/dashboard");
+                return;
             }
-            else
-            {
-                NavigationManager.NavigateTo("/profile");
-            }
-            return;
         }
 
-        Logger.LogWarning("Login failed for email: {Email}", loginModel.Email);
+        Logger.LogWarning("Dev login failed for email: {Email}", loginModel.Email);
         loginFailed = true;
     }
-
 }

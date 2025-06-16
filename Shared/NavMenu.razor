@@ -1,6 +1,6 @@
-﻿@using VibeQuestApp.Services
-@inject NavigationManager NavigationManager
-@inject UserSessionService Session
+﻿@inject NavigationManager NavigationManager
+@inject SignInManager<User> SignInManager
+@inject AuthenticationStateProvider AuthProvider
 @implements IDisposable
 
 <div class="sidebar">
@@ -9,59 +9,18 @@
             <NavLink class="nav-link" href="/">Home</NavLink>
         </li>
 
-        @if (!Session.IsLoggedIn)
-        {
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/hero-customize">Start Your Quest</NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/login">Login</NavLink>
-            </li>
-        }
-        else
-        {
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/profile">Profile</NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/quests">Quests</NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/xp-dashboard">XP Dashboard</NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/journal">Journal</NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/reward-store">Reward Store</NavLink>
-            </li>
-            @if (Session.CurrentUser?.IsDeveloper == true)
-            {
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/developer/dashboard">Developer</NavLink>
-                </li>
-            }
-            <li class="nav-item">
-                <a class="nav-link text-danger" href="#" @onclick="Logout">Logout</a>
-            </li>
-        }
+
     </ul>
 </div>
 
 @code {
-    private void Logout()
+    private async Task Logout()
     {
-        Session.SetUser(null!); // use null-forgiving operator to suppress warning
+        await SignInManager.SignOutAsync();
         NavigationManager.NavigateTo("/");
-    }
-
-    protected override void OnInitialized()
-    {
-        Session.OnChange += StateHasChanged;
     }
 
     public void Dispose()
     {
-        Session.OnChange -= StateHasChanged;
     }
 }

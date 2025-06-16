@@ -1,10 +1,9 @@
 ﻿@using System.ComponentModel.DataAnnotations
-@using Microsoft.EntityFrameworkCore
-@using VibeQuestApp.Data
 @using VibeQuestApp.Models
 @using VibeQuestApp.Services
 @inject AppDbContext Db
-@inject UserSessionService Session
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
 
 <EditForm Model="this" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
@@ -77,24 +76,25 @@
 
     private async Task<bool> HandleFinalStep()
     {
-        var exists = await Db.Users.AnyAsync(u => u.Email == Email);
+        var exists = await UserManager.FindByEmailAsync(Email) != null;
         if (exists)
         {
             ErrorMessage = "This email is already registered.";
             return false;
         }
 
-        var hashed = BCrypt.Net.BCrypt.HashPassword(Password);
-
         var user = new User
         {
             Email = Email,
-            UserName = Email,
-            PasswordHash = hashed
+
         };
 
-        Db.Users.Add(user);
-        await Db.SaveChangesAsync();
+        var createResult = await UserManager.CreateAsync(user, Password);
+        if (!createResult.Succeeded)
+        {
+            ErrorMessage = string.Join("; ", createResult.Errors.Select(e => e.Description));
+            return false;
+        }
 
         var profile = new HeroProfile
         {
@@ -115,7 +115,7 @@
         Db.HeroProfiles.Add(profile);
         await Db.SaveChangesAsync();
 
-        Session.SetUser(user);
+
 
         return true;
     }

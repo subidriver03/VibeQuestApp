@@ -3,12 +3,13 @@
 @using VibeQuestApp.Models
 @using Microsoft.EntityFrameworkCore
 @inject AppDbContext Db
-@inject UserSessionService Session
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager NavigationManager
 
 <h3>Hero Profile</h3>
 
-@if (Session.CurrentUser is null)
+@if (user == null)
 {
     <p class="text-danger">No user session found. Please <a href="/login">log in</a>.</p>
 }
@@ -63,15 +64,18 @@ else
         heroProfile is null ? "0%" :
         $"{Math.Clamp((double)heroProfile.CurrentXP / XpForNextLevel * 100, 0, 100):F0}%";
 
+    private User? user;
+
     protected override async Task OnInitializedAsync()
     {
-        var userId = Session.CurrentUser?.Id;
-        if (string.IsNullOrEmpty(userId))
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        user = await UserManager.GetUserAsync(authState.User);
+        if (user == null)
         {
             NavigationManager.NavigateTo("/login");
             return;
         }
 
-        heroProfile = await Db.HeroProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+        heroProfile = await Db.HeroProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
     }
 }
