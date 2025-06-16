@@ -9,44 +9,7 @@
             <NavLink class="nav-link" href="/">Home</NavLink>
         </li>
 
-        <AuthorizeView>
-            <Authorized>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/profile">Profile</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/quests">Quests</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/xp-dashboard">XP Dashboard</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/journal">Journal</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/reward-store">Reward Store</NavLink>
-                </li>
-                <AuthorizeView Roles="Developer">
-                    <li class="nav-item">
-                        <NavLink class="nav-link" href="/developer/dashboard">Developer</NavLink>
-                    </li>
-                </AuthorizeView>
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="#" @onclick="Logout">Logout</a>
-                </li>
-            </Authorized>
-            <NotAuthorized>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/hero-customize">Start Your Quest</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/login">Login</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/dev-login">Dev Login</NavLink>
-                </li>
-            </NotAuthorized>
-        </AuthorizeView>
+
     </ul>
 </div>
 

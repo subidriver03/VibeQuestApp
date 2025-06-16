@@ -86,7 +86,7 @@
         var user = new User
         {
             Email = Email,
-            UserName = Email
+
         };
 
         var createResult = await UserManager.CreateAsync(user, Password);
@@ -115,7 +115,7 @@
         Db.HeroProfiles.Add(profile);
         await Db.SaveChangesAsync();
 
-        await SignInManager.SignInAsync(user, isPersistent: false);
+
 
         return true;
     }

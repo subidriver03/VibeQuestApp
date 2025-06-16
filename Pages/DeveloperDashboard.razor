@@ -4,12 +4,7 @@
 @using VibeQuestApp.Data
 @using VibeQuestApp.Models
 @inject AppDbContext Db
-@inject UserManager<User> UserManager
-@inject AuthenticationStateProvider AuthProvider
 
-<h3>Developer Dashboard</h3>
-
-@if (user == null || !user.IsDeveloper)
 {
     <p class="text-danger">Access denied.</p>
 }
@@ -73,13 +68,7 @@ else
     private List<User>? users;
     private NewUser newUser = new();
 
-    private User? user;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthProvider.GetAuthenticationStateAsync();
-        user = await UserManager.GetUserAsync(authState.User);
-        if (user?.IsDeveloper == true)
         {
             users = await Db.Users.ToListAsync();
         }
@@ -92,15 +81,7 @@ else
             Email = newUser.Email!,
             UserName = newUser.Email!,
             DisplayName = newUser.DisplayName ?? string.Empty,
-            IsDeveloper = newUser.IsDeveloper
-        };
 
-        var result = await UserManager.CreateAsync(user, newUser.Password!);
-        if (result.Succeeded)
-        {
-            users = await Db.Users.ToListAsync();
-            newUser = new();
-        }
     }
 
     private async Task SaveUser(User user)
