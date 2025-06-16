@@ -1,11 +1,9 @@
 ﻿@page "/login"
 @using System.ComponentModel.DataAnnotations
-@using Microsoft.EntityFrameworkCore
-@using VibeQuestApp.Data
 @using VibeQuestApp.Models
-@inject AppDbContext Db
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
-@inject VibeQuestApp.Services.UserSessionService Session
 @inject ILogger<Login> Logger
 
 <h3>Login</h3>
@@ -40,37 +38,23 @@
     {
         Logger.LogDebug("Attempting login for email: {Email}", loginModel.Email);
 
-        var user = await Db.Users.FirstOrDefaultAsync(u => u.Email == loginModel.Email);
+        var result = await SignInManager.PasswordSignInAsync(loginModel.Email!, loginModel.Password!, false, false);
 
-        if (user != null)
+        if (result.Succeeded)
         {
-            Logger.LogDebug("User found. Verifying password...");
-
-            bool passwordMatches = BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash);
-            if (passwordMatches)
+            var user = await UserManager.FindByEmailAsync(loginModel.Email!);
+            if (user != null && user.IsDeveloper)
             {
-                Logger.LogInformation("Login successful for user: {Email}", user.Email);
-                Session.SetUser(user);
-                if (user.IsDeveloper)
-                {
-                    NavigationManager.NavigateTo("/developer/dashboard");
-                }
-                else
-                {
-                    NavigationManager.NavigateTo("/profile");
-                }
-                return;
+                NavigationManager.NavigateTo("/developer/dashboard");
             }
             else
             {
-                Logger.LogWarning("Password mismatch for email: {Email}", loginModel.Email);
+                NavigationManager.NavigateTo("/profile");
             }
-        }
-        else
-        {
-            Logger.LogWarning("No user found with email: {Email}", loginModel.Email);
+            return;
         }
 
+        Logger.LogWarning("Login failed for email: {Email}", loginModel.Email);
         loginFailed = true;
     }
 

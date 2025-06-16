@@ -4,11 +4,12 @@
 @using VibeQuestApp.Data
 @using VibeQuestApp.Models
 @inject AppDbContext Db
-@inject UserSessionService Session
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthProvider
 
 <h3>Developer Dashboard</h3>
 
-@if (Session.CurrentUser is null || !Session.CurrentUser.IsDeveloper)
+@if (user == null || !user.IsDeveloper)
 {
     <p class="text-danger">Access denied.</p>
 }
@@ -72,9 +73,13 @@ else
     private List<User>? users;
     private NewUser newUser = new();
 
+    private User? user;
+
     protected override async Task OnInitializedAsync()
     {
-        if (Session.CurrentUser?.IsDeveloper == true)
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        user = await UserManager.GetUserAsync(authState.User);
+        if (user?.IsDeveloper == true)
         {
             users = await Db.Users.ToListAsync();
         }
@@ -87,14 +92,15 @@ else
             Email = newUser.Email!,
             UserName = newUser.Email!,
             DisplayName = newUser.DisplayName ?? string.Empty,
-            IsDeveloper = newUser.IsDeveloper,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.Password!)
+            IsDeveloper = newUser.IsDeveloper
         };
 
-        Db.Users.Add(user);
-        await Db.SaveChangesAsync();
-        users = await Db.Users.ToListAsync();
-        newUser = new();
+        var result = await UserManager.CreateAsync(user, newUser.Password!);
+        if (result.Succeeded)
+        {
+            users = await Db.Users.ToListAsync();
+            newUser = new();
+        }
     }
 
     private async Task SaveUser(User user)

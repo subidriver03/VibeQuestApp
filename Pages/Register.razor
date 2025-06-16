@@ -1,8 +1,8 @@
 ﻿@page "/register"
 @using System.ComponentModel.DataAnnotations
-@using Microsoft.EntityFrameworkCore
-@using VibeQuestApp.Data
 @using VibeQuestApp.Models
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
 
@@ -54,23 +54,25 @@
 
     private async Task HandleRegister()
     {
-        var exists = await Db.Users.AnyAsync(u => u.Email == registrationModel.Email);
+        var exists = await UserManager.FindByEmailAsync(registrationModel.Email!) != null;
         if (exists)
         {
             ErrorMessage = "That email is already registered.";
             return;
         }
 
-        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registrationModel.Password!);
-
         var user = new User
         {
             Email = registrationModel.Email!,
-            PasswordHash = hashedPassword
+            UserName = registrationModel.Email!
         };
 
-        Db.Users.Add(user);
-        await Db.SaveChangesAsync();
+        var createResult = await UserManager.CreateAsync(user, registrationModel.Password!);
+        if (!createResult.Succeeded)
+        {
+            ErrorMessage = string.Join("; ", createResult.Errors.Select(e => e.Description));
+            return;
+        }
 
         // Create default HeroProfile for new user
         var profile = new HeroProfile
@@ -92,6 +94,7 @@
         Db.HeroProfiles.Add(profile);
         await Db.SaveChangesAsync();
 
-        NavigationManager.NavigateTo("/login");
+        await SignInManager.SignInAsync(user, isPersistent: false);
+        NavigationManager.NavigateTo("/profile");
     }
 }

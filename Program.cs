@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using VibeQuestApp.Data;
@@ -34,9 +35,10 @@ builder.Services.AddDefaultIdentity<User>(options =>
 })
 .AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<User>>();
+
 // Custom services
 builder.Services.AddScoped<QuestService>();
-builder.Services.AddScoped<UserSessionService>();
 builder.Services.AddScoped<OnboardingStateService>();
 builder.Services.AddScoped<RewardStoreService>();
 
@@ -56,6 +58,7 @@ app.UseStaticFiles(new StaticFileOptions
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     db.Database.Migrate();
 
     if (!db.Users.Any())
@@ -63,11 +66,10 @@ using (var scope = app.Services.CreateScope())
         var testUser = new User
         {
             UserName = "test@example.com",
-            Email = "test@example.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("1234")
+            Email = "test@example.com"
         };
 
-        db.Users.Add(testUser);
+        await userManager.CreateAsync(testUser, "1234");
 
         db.HeroProfiles.Add(new HeroProfile
             {
@@ -110,11 +112,10 @@ using (var scope = app.Services.CreateScope())
         {
             UserName = "dev@example.com",
             Email = "dev@example.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("dev1234"),
             IsDeveloper = true
         };
 
-        db.Users.Add(devUser);
+        await userManager.CreateAsync(devUser, "dev1234");
 
         db.HeroProfiles.Add(new HeroProfile
         {

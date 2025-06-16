@@ -4,10 +4,9 @@ using VibeQuestApp.Models;
 
 namespace VibeQuestApp.Services
 {
-    public class RewardStoreService(AppDbContext db, UserSessionService session)
+    public class RewardStoreService(AppDbContext db)
     {
         private readonly AppDbContext _db = db;
-        private readonly UserSessionService _session = session;
 
         public async Task<HeroProfile?> GetHeroProfileAsync(string userId)
         {

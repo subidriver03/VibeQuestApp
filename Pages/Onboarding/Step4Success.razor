@@ -2,21 +2,22 @@
 @using VibeQuestApp.Data
 @using Microsoft.EntityFrameworkCore
 @inject NavigationManager NavigationManager
-@inject UserSessionService Session
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthProvider
 @inject AppDbContext Db
 
 
 <h3>🎉 Account Created Successfully!</h3>
 
 <div class="card p-3">
-    @if (!string.IsNullOrEmpty(Session.CurrentUser?.AvatarUrl))
+    @if (!string.IsNullOrEmpty(user?.AvatarUrl))
     {
         <img class="img-thumbnail mb-3"
              style="max-width: 300px; max-height: 300px; width: auto; height: auto; display: block; margin: 0 auto;"
-             src="@Session.CurrentUser.AvatarUrl" alt="Avatar" />
+             src="@user.AvatarUrl" alt="Avatar" />
     }
 
-    <h4>Email: @Session.CurrentUser?.Email</h4>
+    <h4>Email: @user?.Email</h4>
     <p>
         Welcome to VibeQuest
         <strong>
@@ -29,18 +30,16 @@
 
 @code {
     private string? HeroName;
+    private User? user;
 
     protected override async Task OnInitializedAsync()
     {
-        if (Session.CurrentUser is not null)
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        user = await UserManager.GetUserAsync(authState.User);
+        if (user is not null)
         {
-            var profile = await Db.HeroProfiles
-                .FirstOrDefaultAsync(p => p.UserId == Session.CurrentUser.Id);
-
-            if (profile is not null)
-            {
-                HeroName = profile.HeroName;
-            }
+            var profile = await Db.HeroProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
+            HeroName = profile?.HeroName;
         }
     }
 
